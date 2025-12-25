@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kartiki Resin Arts – Home</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      margin:0;
+      background:#faf5ff;
+      color:#222;
+    }
+
+    a { text-decoration:none; color:inherit; }
+
+    /* Header / Top Nav */
+    .header {
+      background:#ffffff;
+      border-bottom:1px solid #f1e4f3;
+      position:sticky;
+      top:0;
+      z-index:100;
+    }
+    .header-top {
+      max-width:1100px;
+      margin:0 auto;
+      padding:0.6rem 1rem;
+      display:flex;
+      align-items:center;
+      gap:0.75rem;
+    }
+    .brand-logo-wrap {
+      display:flex;
+      align-items:center;
+      gap:0.4rem;
+    }
+    .logo-icon {
+      width:34px;height:34px;
+      border-radius:50%;
+      background:linear-gradient(135deg,#b02e72,#8b1a62);
+      display:flex;align-items:center;justify-content:center;
+      color:#fff;font-size:1.1rem;
+    }
+    .brand-text {
+      font-weight:700;
+      font-size:1.05rem;
+      white-space:nowrap;
+    }
+
+    .top-search {
+      flex:1;
+      display:flex;
+      align-items:center;
+      gap:0.4rem;
+    }
+    .top-search input{
+      flex:1;
+      padding:0.45rem 0.75rem;
+      border-radius:999px;
+      border:1px solid #e5d6f0;
+      font-size:0.85rem;
+    }
+    .top-search select{
+      padding:0.45rem 0.6rem;
+      border-radius:999px;
+      border:1px solid #e5d6f0;
+      font-size:0.8rem;
+      background:#faf5ff;
+    }
+
+    .top-icons{
+      display:flex;
+      gap:0.6rem;
+      font-size:0.78rem;
+      white-space:nowrap;
+      align-items:center;
+    }
+    .top-icons span{
+      cursor:pointer;
+      color:#555;
+    }
+    .top-icons span strong{color:#b02e72;}
+
+    .admin-link{
+      padding:0.25rem 0.7rem;
+      border-radius:999px;
+      border:1px solid #e5d6f0;
+      font-size:0.78rem;
+      cursor:pointer;
+      color:#b02e72;
+      font-weight:600;
+      background:#faf5ff;
+    }
+    .admin-link:hover{
+      background:#b02e72;
+      color:#fff;
+    }
+
+    /* Second row nav */
+    .header-nav{
+      border-top:1px solid #f1e4f3;
+      background:#faf5ff;
+    }
+    .header-nav-inner{
+      max-width:1100px;
+      margin:0 auto;
+      padding:0.4rem 1rem;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:0.75rem;
+      font-size:0.85rem;
+    }
+    .nav-left{
+      display:flex;
+      gap:0.75rem;
+      align-items:center;
+    }
+    .nav-link{
+      padding:0.25rem 0.6rem;
+      border-radius:999px;
+      cursor:pointer;
+      color:#555;
+    }
+    .nav-link.active{
+      background:#b02e72;
+      color:#fff;
+    }
+    .nav-offers{
+      font-size:0.8rem;
+      color:#b02e72;
+      font-weight:600;
+    }
+
+    /* Offers strip */
+    .offers-strip{
+      background:#b02e72;
+      color:#fff;
+      font-size:0.8rem;
+      padding:0.45rem 0;
+    }
+    .offers-inner{
+      max-width:1100px;
+      margin:0 auto;
+      padding:0 1rem;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:0.75rem;
+    }
+    .offers-inner span{
+      display:flex;
+      align-items:center;
+      gap:0.3rem;
+      white-space:nowrap;
+    }
+
+    /* Sections */
+    .section{
+      max-width:1100px;
+      margin:0 auto;
+      padding:1.2rem 1rem;
+    }
+    .section-title{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:0.9rem;
+      font-size:0.95rem;
+    }
+    .section-title h2{
+      font-size:1rem;
+      margin:0;
+    }
+
+    /* Categories */
+    .category-row{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(90px,1fr));
+      gap:0.8rem;
+    }
+    .category-pill{
+      background:#fff;
+      border-radius:999px;
+      padding:0.5rem 0.4rem;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:0.3rem;
+      box-shadow:0 2px 6px rgba(0,0,0,0.06);
+      cursor:pointer;
+      border:1px solid transparent;
+      font-size:0.78rem;
+    }
+    .category-pill:hover,
+    .category-pill.active{
+      border-color:#b02e72;
+      box-shadow:0 2px 10px rgba(176,46,114,0.22);
+    }
+    .category-circle{
+      width:52px;height:52px;
+      border-radius:50%;
+      border:1px dashed #e5d6f0;
+      display:flex;align-items:center;justify-content:center;
+      font-size:1.1rem;
+      color:#b02e72;
+      background:#faf5ff;
+    }
+    .category-name{
+      text-align:center;
+    }
+
+    /* Product cards: add expanded height via class */
+    .product-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+      gap:1rem;
+    }
+    .product-card {
+        height: 700px;
+      background:#fff;
+      border-radius:12px;
+      padding:1rem;
+      box-shadow:0 4px 14px rgba(0,0,0,0.06);
+      font-size:0.9rem;
+      position:relative;
+      transition: box-shadow 0.3s ease, transform 0.3s ease, max-height 0.35s ease;
+      overflow:hidden;
+      max-height: 440px;   /* normal height */
+    }
+    .product-card:hover{
+      box-shadow:0 10px 30px rgba(0,0,0,0.12);
+      transform:translateY(-3px);
+    }
+    .product-card.expanded{
+      max-height: 650px;   /* clicked card becomes taller */
+    }
+
+    .product-card img {
+      width:100%;
+      border-radius:10px;
+      aspect-ratio:3/4;
+      object-fit:cover;
+      margin-bottom:0.7rem;
+    }
+    .badge-offer {
+      position:absolute;
+      top:1rem;
+      left:1rem;
+      background:#b02e72;
+      color:#fff;
+      padding:0.15rem 0.5rem;
+      border-radius:999px;
+      font-size:0.7rem;
+    }
+    .product-name { font-weight:600; margin-bottom:0.3rem; }
+    .price-row { display:flex;align-items:center;gap:0.4rem;margin-bottom:0.3rem; }
+    .price { font-weight:700;color:#b02e72; }
+    .delivery { font-size:0.75rem;color:#2f855a;margin-bottom:0.4rem; }
+
+    /* collapsible info under that card */
+    .product-details {
+      background:#f8f4ff;
+      border-radius:10px;
+      border-left:4px solid #b02e72;
+      margin-top:0.4rem;
+      padding:0 0.8rem;
+      max-height:0;
+      overflow:hidden;
+      transition:max-height 0.35s ease, padding 0.35s ease;
+    }
+    .product-details.open {
+      padding:0.8rem 0.8rem 0.9rem;
+      max-height:260px;
+    }
+    .product-details p {
+      margin:0 0 0.5rem 0;
+      font-size:0.86rem;
+      color:#444;
+      line-height:1.4;
+    }
+    .product-details ul{
+      margin:0;
+      padding-left:1.1rem;
+      font-size:0.82rem;
+      color:#555;
+    }
+    .product-details li{margin-bottom:0.25rem;}
+
+    .product-actions { 
+      display:flex;
+      gap:0.3rem;
+      margin-top:0.5rem;
+    }
+    .btn-xs{
+      flex:1;
+      padding:0.4rem 0.6rem;
+      font-size:0.78rem;
+      border-radius:999px;
+      border:1px solid #eee;
+      background:#fff;
+      cursor:pointer;
+      transition:all 0.2s;
+      font-weight:600;
+    }
+    .btn-xs:hover{ transform:scale(1.04); }
+    .btn-xs.primary{ background:#b02e72;color:#fff;border-color:#b02e72; }
+    .btn-xs.toggle{ background:#f8f4ff;border-color:#b02e72;color:#b02e72; }
+
+    .no-results{
+      text-align:center;
+      padding:2.5rem 1rem;
+      color:#666;
+      font-size:0.9rem;
+    }
+
+    @media(max-width:768px){
+      .header-top{flex-wrap:wrap;}
+      .top-search{order:3;width:100%;}
+      .top-icons{font-size:0.72rem;}
+      .product-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:0.8rem;}
+      .product-card{max-height:340px;}
+      .product-card.expanded{max-height:620px;}
+    }
+    @media(max-width:480px){
+      .section{padding:1rem 0.8rem;}
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-top">
+      <div class="brand-logo-wrap">
+        <div class="logo-icon">K</div>
+        <div class="brand-text">Kartiki Resin Arts</div>
+      </div>
+
+      <div class="top-search">
+        <input type="text" id="searchInput" placeholder="Search Kartiki products..." />
+        <select id="categoryFilterTop">
+          <option value="">All</option>
+        </select>
+      </div>
+
+      <div class="top-icons">
+        <span>Profile</span>
+        <span>Cart</span>
+        <span>Wishlist</span>
+        <span><strong>Best seller</strong></span>
+        <button class="admin-link" type="button" onclick="openAdmin()">Admin</button>
+      </div>
+    </div>
+
+    <div class="header-nav">
+      <div class="header-nav-inner">
+        <div class="nav-left">
+          <span class="nav-link active" onclick="scrollToSection('products')">Home</span>
+          <span class="nav-link" onclick="scrollToSection('products')">All Products</span>
+          <span class="nav-link" onclick="scrollToSection('categories-strip')">Categories</span>
+          <span class="nav-link" onclick="scrollToSection('about')">About</span>
+        </div>
+        <div class="nav-offers">⚡ Festive Offers • New arrivals daily</div>
+      </div>
+    </div>
+
+    <div class="offers-strip">
+      <div class="offers-inner">
+        <span>🚚 Free Shipping on big orders</span>
+        <span>💰 Cash on Delivery Available</span>
+        <span>🎁 Custom name & photo gifts</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Categories -->
+  <section id="categories-strip" class="section">
+    <div class="section-title">
+      <h2>• Popular Categories</h2>
+    </div>
+
+    <div class="category-row">
+      <div class="category-pill" onclick="alert('Categories admin मधून add होतात 🙂')">
+        <div class="category-circle">+</div>
+        <div class="category-name">Create category</div>
+      </div>
+
+      <div class="category-pill" data-cat="Home Decor" onclick="filterByCategoryCircle('Home Decor')">
+        <div class="category-circle">🏠</div>
+        <div class="category-name">Home Decor</div>
+      </div>
+
+      <div class="category-pill" data-cat="Jewellery" onclick="filterByCategoryCircle('Jewellery')">
+        <div class="category-circle">💍</div>
+        <div class="category-name">Jewellery</div>
+      </div>
+
+      <div class="category-pill" data-cat="Keychains" onclick="filterByCategoryCircle('Keychains')">
+        <div class="category-circle">🔑</div>
+        <div class="category-name">Keychains</div>
+      </div>
+
+      <div class="category-pill" data-cat="Pooja Thalis" onclick="filterByCategoryCircle('Pooja Thalis')">
+        <div class="category-circle">🪔</div>
+        <div class="category-name">Pooja Thalis</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUCTS -->
+  <section id="products" class="section">
+    <div class="section-title">
+      <h2>Latest Resin Products</h2>
+    </div>
+
+    <div id="productGrid" class="product-grid"></div>
+
+    <p id="emptyText" style="font-size:0.85rem;color:#777;margin-top:0.8rem;display:none;">
+      अजून products add केलेले नाहीत. कृपया admin page (admin.html) वरून products add करा.
+    </p>
+
+    <div id="noResults" class="no-results" style="display:none;">
+      🔍 No products found for this search / category.
+    </div>
+  </section>
+
+  <!-- About -->
+  <section id="about" class="section">
+    <div class="section-title">
+      <h2>About Kartiki Resin Arts</h2>
+    </div>
+    <p style="font-size:0.9rem;color:#555;">
+      प्रत्येक product प्रेमाने हाताने बनवलेला आहे. Custom name, photo, colours आणि special occasions साठी सुंदर resin gifts इथे मिळतात.
+    </p>
+  </section>
+
+  <script>
+    const whatsappNumber = "919876543210";
+    let allProducts = [];
+
+    function openAdmin(){
+      window.open("admin.html","_blank");
+    }
+
+    function scrollToSection(id){
+      const el = document.getElementById(id);
+      if(el){ el.scrollIntoView({behavior:"smooth"}); }
+    }
+
+    function openWhatsApp(message) {
+      const encoded = encodeURIComponent(message);
+      window.open(`https://wa.me/${whatsappNumber}?text=${encoded}`,"_blank");
+    }
+
+    // View details → त्या card खालीच info, आणि तोच card उंच दिसेल
+    function toggleDetails(btn){
+      const card = btn.closest(".product-card");
+      const box  = card.querySelector(".product-details");
+      const isOpen = box.classList.contains("open");
+
+      if(isOpen){
+        box.classList.remove("open");
+        card.classList.remove("expanded");
+        btn.textContent = "View details";
+      }else{
+        // इतर cards reset
+        document.querySelectorAll(".product-details.open").forEach(d=>{
+          d.classList.remove("open");
+          const c = d.closest(".product-card");
+          c.classList.remove("expanded");
+          const b = c.querySelector(".btn-xs.toggle");
+          if(b) b.textContent = "View details";
+        });
+
+        box.classList.add("open");
+        card.classList.add("expanded");
+        btn.textContent = "Hide details";
+        card.scrollIntoView({behavior:"smooth", block:"center"});
+      }
+    }
+
+    function createProductCard(p){
+      const priceText = isNaN(p.price) ? p.price : "₹" + Number(p.price).toLocaleString("en-IN");
+      const description = p.description || "Beautiful handmade resin art product made with love.";
+
+      const card = document.createElement("article");
+      card.className = "product-card";
+      card.innerHTML = `
+        <span class="badge-offer">${p.category || "New"}</span>
+        <img src="${p.image || "https://via.placeholder.com/300x220/b02e72/ffffff?text=No+Image"}"
+             alt="${p.name}" loading="lazy">
+        <div class="product-name">${p.name}</div>
+        <div class="price-row">
+          <span class="price">${priceText}</span>
+        </div>
+        <div class="delivery">Handmade • Made on order</div>
+
+        <div class="product-details">
+          <p>${description}</p>
+          <ul>
+            <li>Custom colours, name / photo option available.</li>
+            <li>Processing time: 3–7 days.</li>
+            <li>Secure bubble wrap + gift box packing.</li>
+            <li>COD available in selected locations.</li>
+          </ul>
+        </div>
+
+        <div class="product-actions">
+          <button class="btn-xs toggle" onclick="toggleDetails(this)">View details</button>
+          <button class="btn-xs primary"
+            onclick="openWhatsApp('Order: ${p.name} – ${priceText}, Qty 1')">
+            Order
+          </button>
+        </div>`;
+      return card;
+    }
+
+    function loadProductsFromStorage(){
+      const raw = localStorage.getItem("products"); // admin.html ने save केलेले products [web:45]
+      const grid = document.getElementById("productGrid");
+      const emptyText = document.getElementById("emptyText");
+      const noResults = document.getElementById("noResults");
+
+      grid.innerHTML = "";
+      noResults.style.display = "none";
+
+      if(!raw){
+        emptyText.style.display = "block";
+        return;
+      }
+      try{
+        allProducts = JSON.parse(raw) || [];
+      }catch(e){
+        allProducts = [];
+      }
+      if(!Array.isArray(allProducts) || allProducts.length===0){
+        emptyText.style.display = "block";
+        return;
+      }
+      emptyText.style.display = "none";
+
+      renderProducts(allProducts);
+      populateTopCategoryDropdown();
+    }
+
+    function renderProducts(list){
+      const grid = document.getElementById("productGrid");
+      const noResults = document.getElementById("noResults");
+      grid.innerHTML = "";
+      if(!list.length){
+        noResults.style.display = "block";
+        return;
+      }
+      noResults.style.display = "none";
+      list.forEach(p=>grid.appendChild(createProductCard(p)));
+    }
+
+    function populateTopCategoryDropdown(){
+      const sel = document.getElementById("categoryFilterTop");
+      const cats = [...new Set(allProducts.map(p=>p.category).filter(Boolean))];
+      sel.innerHTML = `<option value="">All</option>`;
+      const priority = ["Home Decor","Jewellery","Keychains","Pooja Thalis"];
+      priority.forEach(c=>{
+        if(cats.includes(c)){
+          const o=document.createElement("option");
+          o.value=c;o.textContent=c;sel.appendChild(o);
+        }
+      });
+      cats.forEach(c=>{
+        if(!priority.includes(c)){
+          const o=document.createElement("option");
+          o.value=c;o.textContent=c;sel.appendChild(o);
+        }
+      });
+    }
+
+    function applyFilters(){
+      const search = document.getElementById("searchInput").value.toLowerCase().trim();
+      const cat = document.getElementById("categoryFilterTop").value;
+      let list = allProducts;
+      if(search){
+        list = list.filter(p=>p.name.toLowerCase().includes(search));
+      }
+      if(cat){
+        list = list.filter(p=>p.category===cat);
+      }
+      renderProducts(list);
+    }
+
+    document.getElementById("searchInput").addEventListener("input",applyFilters);
+    document.getElementById("categoryFilterTop").addEventListener("change",applyFilters);
+
+    function filterByCategoryCircle(cat){
+      document.getElementById("categoryFilterTop").value = cat;
+      applyFilters();
+      document.querySelectorAll(".category-pill").forEach(p=>p.classList.remove("active"));
+      const target = document.querySelector(`.category-pill[data-cat="${cat}"]`);
+      if(target) target.classList.add("active");
+      scrollToSection("products");
+    }
+
+    document.addEventListener("DOMContentLoaded",loadProductsFromStorage);
+  </script>
+</body>
+</html>
