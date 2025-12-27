@@ -28,20 +28,27 @@
   .admin-header{
     background: linear-gradient(135deg, #b02e72, #8b1a62);
     color:#fff;
-    padding:2rem;
+    padding:2rem 1.5rem;
     border-radius:25px;
     text-align:center;
     margin-bottom:2.5rem;
     box-shadow:0 20px 60px rgba(176,46,114,0.4);
   }
   .admin-header h1{
-    font-size:2.2rem;
+    font-size:clamp(1.5rem, 4vw, 2.2rem);
     font-weight:800;
     margin-bottom:0.5rem;
   }
   .admin-header p{
-    font-size:1.1rem;
+    font-size:clamp(0.95rem, 2.5vw, 1.1rem);
     opacity:0.95;
+    margin-bottom:1rem;
+  }
+  .admin-header .btn-container{
+    display:flex;
+    gap:1rem;
+    justify-content:center;
+    flex-wrap:wrap;
   }
 
   /* DASHBOARD CARDS */
@@ -54,10 +61,11 @@
   .dash-card{
     background:#fff;
     border-radius:20px;
-    padding:2rem;
+    padding:2rem 1.5rem;
     box-shadow:0 15px 45px rgba(191,72,134,0.2);
     border:2px solid #f3d2f0;
     transition:all 0.3s ease;
+    text-align:center;
   }
   .dash-card:hover{
     transform:translateY(-8px);
@@ -74,10 +82,10 @@
     justify-content:center;
     color:#fff;
     font-size:1.8rem;
-    margin-bottom:1rem;
+    margin:0 auto 1rem auto;
   }
   .dash-number{
-    font-size:2.5rem;
+    font-size:clamp(1.8rem, 6vw, 2.5rem);
     font-weight:800;
     color:#b02e72;
     margin-bottom:0.3rem;
@@ -92,25 +100,26 @@
   .section{
     background:#fff;
     border-radius:20px;
-    padding:2.5rem;
+    padding:2.5rem 2rem;
     margin-bottom:2rem;
     box-shadow:0 15px 45px rgba(191,72,134,0.15);
     border:2px solid #f3d2f0;
   }
   .section-title{
-    font-size:1.8rem;
+    font-size:clamp(1.4rem, 4vw, 1.8rem);
     font-weight:800;
     color:#9b1b63;
     margin-bottom:1.5rem;
     display:flex;
     align-items:center;
     gap:0.8rem;
+    flex-wrap:wrap;
   }
 
   /* ADD PRODUCT FORM */
   .product-form-grid{
     display:grid;
-    grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));
     gap:1.5rem;
     margin-bottom:2rem;
   }
@@ -122,7 +131,7 @@
   .form-label{
     font-weight:700;
     color:#555;
-    font-size:0.95rem;
+    font-size:clamp(0.85rem, 2.5vw, 0.95rem);
   }
   .form-input, .form-textarea, .form-select{
     padding:1rem 1.2rem;
@@ -141,13 +150,16 @@
     min-height:100px;
     resize:vertical;
   }
+  .form-row-full{
+    grid-column:1/-1;
+  }
 
   /* BUTTONS */
   .btn{
-    padding:1rem 2rem;
+    padding:clamp(0.8rem, 3vw, 1rem) clamp(1.5rem, 4vw, 2rem);
     border-radius:15px;
     font-weight:700;
-    font-size:1.1rem;
+    font-size:clamp(0.9rem, 3vw, 1.1rem);
     cursor:pointer;
     border:none;
     transition:all 0.3s ease;
@@ -155,13 +167,15 @@
     align-items:center;
     gap:0.7rem;
     text-decoration:none;
+    justify-content:center;
+    white-space:nowrap;
   }
   .btn-primary{
     background:linear-gradient(135deg, #b02e72, #8b1a62);
     color:#fff;
     box-shadow:0 10px 30px rgba(176,46,114,0.4);
   }
-  .btn-primary:hover{
+  .btn-primary:hover,.btn-primary:active{
     transform:translateY(-3px);
     box-shadow:0 18px 40px rgba(176,46,114,0.5);
   }
@@ -171,7 +185,7 @@
     border:3px solid #f2c9e3;
     font-weight:800;
   }
-  .btn-secondary:hover{
+  .btn-secondary:hover,.btn-secondary:active{
     background:#b02e72;
     color:#fff;
     transform:translateY(-2px);
@@ -180,20 +194,23 @@
     background:#f44336;
     color:#fff;
   }
-  .btn-danger:hover{
+  .btn-danger:hover,.btn-danger:active{
     background:#d32f2f;
     transform:translateY(-2px);
   }
 
   /* PRODUCTS TABLE */
+  .products-table-wrapper{
+    overflow-x:auto;
+    border-radius:15px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.1);
+    margin-top:1.5rem;
+  }
   .products-table{
     width:100%;
+    min-width:600px;
     border-collapse:collapse;
-    margin-top:1.5rem;
     background:#fff;
-    border-radius:15px;
-    overflow:hidden;
-    box-shadow:0 10px 30px rgba(0,0,0,0.1);
   }
   .products-table th{
     background:linear-gradient(135deg, #b02e72, #8b1a62);
@@ -202,10 +219,14 @@
     text-align:left;
     font-weight:700;
     font-size:0.95rem;
+    position:sticky;
+    top:0;
+    z-index:10;
   }
   .products-table td{
     padding:1.2rem 1rem;
     border-bottom:1px solid #f3d2f0;
+    vertical-align:top;
   }
   .products-table tr:hover{
     background:rgba(176,46,114,0.05);
@@ -217,22 +238,64 @@
     border-radius:20px;
     font-weight:700;
     font-size:0.9rem;
+    white-space:nowrap;
   }
   .action-buttons{
     display:flex;
     gap:0.5rem;
+    flex-wrap:wrap;
+  }
+  .no-products{
+    text-align:center;
+    padding:3rem 1rem;
+    color:#999;
   }
 
-  /* RESPONSIVE */
+  /* SECTION HEADER */
+  .section-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:1.5rem;
+    flex-wrap:wrap;
+    gap:1rem;
+  }
+
+  /* RESPONSIVE IMPROVEMENTS */
+  @media(max-width:1024px){
+    .page-wrap{padding:1.25rem;}
+    .dashboard-grid{grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:1.25rem;}
+  }
+  
   @media(max-width:768px){
     .page-wrap{padding:1rem;}
-    .admin-header{padding:1.5rem;}
-    .admin-header h1{font-size:1.7rem;}
+    .admin-header{padding:1.5rem 1.25rem;}
+    .section{padding:1.75rem 1.5rem;}
+    .dashboard-grid{grid-template-columns:repeat(2, 1fr); gap:1rem;}
+    .product-form-grid{grid-template-columns:1fr; gap:1.25rem;}
+  }
+  
+  @media(max-width:480px){
+    .page-wrap{padding:0.75rem;}
+    .admin-header{padding:1.25rem 1rem;}
+    .admin-header .btn-container{flex-direction:column; width:100%;}
+    .admin-header .btn{flex:1;}
+    .section{padding:1.5rem 1.25rem;}
     .dashboard-grid{grid-template-columns:1fr; gap:1rem;}
-    .product-form-grid{grid-template-columns:1fr;}
-    .section{padding:1.5rem;}
+    .products-table th, .products-table td{padding:1rem 0.75rem;}
     .products-table{font-size:0.9rem;}
-    .products-table th, .products-table td{padding:0.8rem 0.5rem;}
+    .section-header{flex-direction:column; align-items:stretch;}
+  }
+  
+  @media(max-width:360px){
+    .products-table th, .products-table td{padding:0.75rem 0.5rem;}
+    .dash-card{padding:1.5rem 1rem;}
+  }
+
+  /* TOUCH FRIENDLY */
+  @media(hover: none) and (pointer: coarse){
+    .btn:active{transform:translateY(-2px) scale(0.98);}
+    .dash-card:active{transform:translateY(-4px);}
   }
 </style>
 </head>
@@ -243,9 +306,14 @@
   <header class="admin-header">
     <h1>🔐 Admin Dashboard</h1>
     <p>Kartiki Resin Arts - Manage Products & Orders</p>
-    <button class="btn btn-secondary" onclick="window.location.href='index.html'">
-      🏠 Back to Website
-    </button>
+    <div class="btn-container">
+      <button class="btn btn-secondary" onclick="window.location.href='index.html'">
+        🏠 Back to Website
+      </button>
+      <button class="btn btn-primary" onclick="refreshData()">
+        🔄 Refresh Data
+      </button>
+    </div>
   </header>
 
   <!-- DASHBOARD STATS -->
@@ -263,76 +331,85 @@
     <div class="dash-card">
       <div class="dash-icon">💰</div>
       <div class="dash-number" id="totalRevenue">₹0</div>
-      <div class="dash-label">Pending Orders</div>
+      <div class="dash-label">Total Value</div>
     </div>
     <div class="dash-card">
-      <div class="dash-icon">👀</div>
+      <div class="dash-icon">📊</div>
       <div class="dash-number" id="totalVisitors">0</div>
-      <div class="dash-label">Visitors Today</div>
+      <div class="dash-label">Products Added</div>
     </div>
   </div>
 
   <!-- ADD NEW PRODUCT -->
   <section class="section">
-    <h2 class="section-title">➕ Add New Product</h2>
+    <div class="section-header">
+      <h2 class="section-title">➕ Add New Product</h2>
+    </div>
     <form id="addProductForm" class="product-form-grid">
       <div class="form-group">
-        <label class="form-label">Product Name</label>
-        <input type="text" id="productName" class="form-input" required placeholder="Ex: Ocean Wave Coaster">
+        <label class="form-label">Product Name *</label>
+        <input type="text" id="productName" class="form-input" required 
+               placeholder="Ex: Ocean Wave Coaster Set" maxlength="100">
       </div>
       <div class="form-group">
-        <label class="form-label">Price (₹)</label>
-        <input type="number" id="productPrice" class="form-input" required placeholder="500">
+        <label class="form-label">Price (₹) *</label>
+        <input type="number" id="productPrice" class="form-input" required 
+               placeholder="499" min="0" step="0.01">
       </div>
       <div class="form-group">
-        <label class="form-label">Category</label>
+        <label class="form-label">Category *</label>
         <select id="productCategory" class="form-select" required>
           <option value="">Select Category</option>
-          <option value="coasters">Coasters</option>
-          <option value="jewellery">Jewellery</option>
-          <option value="keychains">Keychains</option>
-          <option value="pooja thali">Pooja Thali</option>
+          <option value="coasters">☕ Coasters</option>
+          <option value="jewellery">💍 Jewellery</option>
+          <option value="keychains">🔗 Keychains</option>
+          <option value="pooja thali">🛕 Pooja Thali</option>
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Image URL (Optional)</label>
-        <input type="url" id="productImage" class="form-input" placeholder="https://example.com/image.jpg">
+        <label class="form-label">Image URL</label>
+        <input type="url" id="productImage" class="form-input" 
+               placeholder="https://example.com/image.jpg">
       </div>
       <div class="form-group">
         <label class="form-label">Description</label>
-        <textarea id="productDescription" class="form-textarea" placeholder="Product details..."></textarea>
+        <textarea id="productDescription" class="form-textarea" 
+                  placeholder="Enter product details, features, size, material etc..."
+                  maxlength="500"></textarea>
       </div>
-      <div style="grid-column:1/-1;">
-        <button type="submit" class="btn btn-primary">✅ Add Product</button>
+      <div class="form-row-full">
+        <button type="submit" class="btn btn-primary">✅ Add Product Now</button>
       </div>
     </form>
   </section>
 
   <!-- PRODUCTS LIST -->
   <section class="section">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+    <div class="section-header">
       <h2 class="section-title">📋 All Products</h2>
-      <button class="btn btn-secondary" onclick="clearAllProducts()">🗑️ Clear All</button>
+      <button class="btn btn-danger" onclick="clearAllProducts()">🗑️ Clear All Products</button>
     </div>
-    <table class="products-table" id="productsTable">
-      <thead>
-        <tr>
-          <th>Image</th>
-          <th>Name</th>
-          <th>Price</th>
-          <th>Category</th>
-          <th>Description</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody id="productsTableBody">
-        <tr>
-          <td colspan="6" style="text-align:center;padding:3rem;color:#999;">
-            🚀 Products येथे दिसतील. वरील form मधून add करा!
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="products-table-wrapper">
+      <table class="products-table" id="productsTable">
+        <thead>
+          <tr>
+            <th>Preview</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Category</th>
+            <th>Description</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="productsTableBody">
+          <tr>
+            <td colspan="6" class="no-products">
+              🚀 Add your first product using the form above!
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </section>
 
 </div>
@@ -364,25 +441,32 @@
     
     const product = {
       id: Date.now(),
-      name: document.getElementById('productName').value,
+      name: document.getElementById('productName').value.trim(),
       price: parseFloat(document.getElementById('productPrice').value),
       category: document.getElementById('productCategory').value,
-      image: document.getElementById('productImage').value || '',
-      description: document.getElementById('productDescription').value
+      image: document.getElementById('productImage').value.trim() || '',
+      description: document.getElementById('productDescription').value.trim()
     };
 
     const products = loadProducts();
     products.push(product);
     saveProducts(products);
 
-    // Reset form
+    // Reset form with success feedback
     this.reset();
-    alert('✅ Product successfully added!');
+    const submitBtn = this.querySelector('.btn-primary');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = '✅ Added!';
+    submitBtn.style.background = '#4CAF50';
+    setTimeout(() => {
+      submitBtn.textContent = originalText;
+      submitBtn.style.background = '';
+    }, 2000);
   });
 
   // Delete product
   function deleteProduct(id){
-    if(confirm('🗑️ Delete this product?')){
+    if(confirm('🗑️ Are you sure you want to delete this product?')){
       const products = loadProducts();
       const updated = products.filter(p => p.id !== id);
       saveProducts(updated);
@@ -392,12 +476,13 @@
   // Render dashboard stats
   function renderDashboard(){
     const products = loadProducts();
-    const categories = [...new Set(products.map(p => p.category))];
+    const categories = [...new Set(products.map(p => p.category).filter(Boolean))];
     
     document.getElementById('totalProducts').textContent = products.length;
-    document.getElementById('totalCategories').textContent = categories.length;
-    document.getElementById('totalRevenue').textContent = '₹' + products.reduce((sum, p) => sum + (p.price || 0), 0).toLocaleString('en-IN');
-    document.getElementById('totalVisitors').textContent = '1,247';
+    document.getElementById('totalCategories').textContent = categories.length || 0;
+    document.getElementById('totalRevenue').textContent = 
+      '₹' + products.reduce((sum, p) => sum + (p.price || 0), 0).toLocaleString('en-IN');
+    document.getElementById('totalVisitors').textContent = products.length;
   }
 
   // Render products table
@@ -408,8 +493,9 @@
     if(products.length === 0){
       tbody.innerHTML = `
         <tr>
-          <td colspan="6" style="text-align:center;padding:3rem;color:#999;">
-            🚀 Products येथे दिसतील. वरील form मधून add करा!
+          <td colspan="6" class="no-products">
+            🚀 <strong>Add your first product</strong> using the form above!<br>
+            <small>Products will appear here and on your main website instantly.</small>
           </td>
         </tr>
       `;
@@ -420,12 +506,16 @@
       <tr>
         <td>
           <img src="${product.image || 'https://via.placeholder.com/60x60/b02e72/fff?text=R'}" 
-               alt="${product.name}" style="width:50px;height:50px;border-radius:10px;object-fit:cover;">
+               alt="${product.name}" 
+               style="width:50px;height:50px;border-radius:10px;object-fit:cover;border:2px solid #f3d2f0;">
         </td>
-        <td><strong>${product.name}</strong></td>
+        <td>
+          <strong>${product.name}</strong>
+          <br><small style="color:#999;">ID: ${product.id}</small>
+        </td>
         <td><span class="price-badge">₹${Number(product.price).toLocaleString('en-IN')}</span></td>
-        <td>${product.category}</td>
-        <td>${product.description.substring(0, 80)}${product.description.length > 80 ? '...' : ''}</td>
+        <td style="font-weight:600;color:#9b1b63;">${product.category}</td>
+        <td>${(product.description || 'No description').substring(0, 60)}${(product.description || '').length > 60 ? '...' : ''}</td>
         <td>
           <div class="action-buttons">
             <button class="btn btn-danger" style="padding:0.5rem 1rem;font-size:0.85rem;" 
@@ -440,12 +530,17 @@
 
   // Clear all products
   function clearAllProducts(){
-    if(confirm('⚠️ Delete ALL products? This cannot be undone!')){
+    if(confirm('⚠️ Delete ALL products? This action cannot be undone!\n\nAll products will be permanently removed from your website.')){
       localStorage.removeItem(STORAGE_KEY);
       renderDashboard();
       renderProductsTable();
-      alert('🗑️ All products cleared!');
     }
+  }
+
+  // Refresh data
+  function refreshData(){
+    renderDashboard();
+    renderProductsTable();
   }
 
   // Initialize
