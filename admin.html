@@ -500,18 +500,18 @@
       </div>
     </div>
 
-    <!-- 🔥 IMAGE UPLOAD GALLERY -->
+    <!-- 🔥 IMAGE UPLOAD GALLERY (MANDATORY) -->
     <div class="image-upload-section" onclick="document.getElementById('imageUpload').click()">
       <div class="upload-icon">📸</div>
-      <strong>Click to upload or drag images here</strong><br>
-      <small style="color:#999;">Supported: JPG, PNG, WebP (Max 5MB)</small>
+      <strong>Click to upload or drag images here <span style="color:#b02e72; font-weight:700;">*</span></strong><br>
+      <small style="color:#999;">Supported: JPG, PNG, WebP (Max 5MB) - Required for products</small>
       <input type="file" id="imageUpload" accept="image/*" multiple style="display:none;" onchange="handleImageUpload(event)">
     </div>
 
     <!-- IMAGE GALLERY -->
     <div id="imageGallery" style="display:none;">
       <div style="margin-bottom:1rem;">
-        <strong>📷 Select Image:</strong> 
+        <strong>📷 Select Image <span style="color:#b02e72; font-weight:700;">*</span>:</strong> 
         <span id="selectedImageName" style="color:#b02e72; font-weight:700;"></span>
         <button class="btn btn-secondary btn-small" onclick="clearImageSelection()" style="margin-left:1rem;">Clear Selection</button>
       </div>
@@ -524,28 +524,23 @@
       <img id="previewImage" class="preview-image" src="" alt="Selected">
     </div>
 
-    <!-- PRODUCT FORM -->
+    <!-- PRODUCT FORM (NO URL FIELD) -->
     <form id="addProductForm" class="product-form-grid">
       <div class="form-group">
-        <label class="form-label">Product Name *</label>
+        <label class="form-label">Product Name <span style="color:#b02e72;">*</span></label>
         <input type="text" id="productName" class="form-input" required 
                placeholder="Ex: Ocean Wave Coaster Set" maxlength="100">
       </div>
       <div class="form-group">
-        <label class="form-label">Price (₹) *</label>
+        <label class="form-label">Price (₹) <span style="color:#b02e72;">*</span></label>
         <input type="number" id="productPrice" class="form-input" required 
                placeholder="499" min="0" step="0.01">
       </div>
       <div class="form-group">
-        <label class="form-label">Category *</label>
+        <label class="form-label">Category <span style="color:#b02e72;">*</span></label>
         <select id="productCategory" class="form-select" required>
           <option value="">Select Category</option>
         </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Image URL (Auto-filled from gallery)</label>
-        <input type="url" id="productImage" class="form-input" readonly 
-               placeholder="Image will be selected from gallery above">
       </div>
       <div class="form-group">
         <label class="form-label">Description</label>
@@ -795,7 +790,6 @@
 
   function selectImage(url, name){
     selectedImageUrl = url;
-    document.getElementById('productImage').value = url;
     document.getElementById('selectedImageName').textContent = name;
     
     // Update preview
@@ -813,7 +807,6 @@
 
   function clearImageSelection(){
     selectedImageUrl = '';
-    document.getElementById('productImage').value = '';
     document.getElementById('selectedImageName').textContent = '';
     document.getElementById('imagePreview').style.display = 'none';
     document.querySelectorAll('.gallery-image').forEach(img => img.classList.remove('selected'));
@@ -826,12 +819,13 @@
     renderProductsTable();
   }
 
-  // Add product
+  // Add product (NO URL FIELD - ONLY GALLERY REQUIRED)
   document.getElementById('addProductForm').addEventListener('submit', function(e){
     e.preventDefault();
     
-    if(!selectedImageUrl && !document.getElementById('productImage').value){
-      alert('⚠️ Please select an image from gallery or enter URL');
+    // Image selection MANDATORY
+    if(!selectedImageUrl){
+      alert('⚠️ Please select an image from gallery first!\n\n📸 Upload images → Select from gallery → Add product');
       return;
     }
     
@@ -840,7 +834,7 @@
       name: document.getElementById('productName').value.trim(),
       price: parseFloat(document.getElementById('productPrice').value),
       category: document.getElementById('productCategory').value,
-      image: selectedImageUrl || document.getElementById('productImage').value.trim(),
+      image: selectedImageUrl, // Only from gallery
       description: document.getElementById('productDescription').value.trim()
     };
 
@@ -891,7 +885,7 @@
         <tr>
           <td colspan="6" class="no-products">
             🚀 <strong>Add your first product</strong> using the form above!<br>
-            <small>📸 Upload images first, then create products!</small>
+            <small>📸 Upload images first → Select image → Create product!</small>
           </td>
         </tr>
       `;
