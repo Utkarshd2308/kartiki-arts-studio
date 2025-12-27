@@ -116,6 +116,68 @@
     flex-wrap:wrap;
   }
 
+  /* IMAGE UPLOAD SECTION */
+  .image-upload-section{
+    background: linear-gradient(135deg, #fff8fd 0%, #fef2fc 100%);
+    border: 2px dashed #f2c9e3;
+    border-radius: 15px;
+    padding: 2rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  .image-upload-section:hover{
+    border-color: #b02e72;
+    background: linear-gradient(135deg, #fff5fd 0%, #fef0fc 100%);
+    transform: scale(1.02);
+  }
+  .image-upload-section.dragover{
+    border-color: #b02e72 !important;
+    background: linear-gradient(135deg, #fff0fb 0%, #fef0fc 100%);
+    box-shadow: 0 0 0 3px rgba(176,46,114,0.2);
+  }
+  .upload-icon{
+    font-size: 4rem;
+    background: linear-gradient(135deg, #b02e72, #8b1a62);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+    display: block;
+  }
+  .image-gallery{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  .gallery-image{
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 3px solid #f3d2f0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .gallery-image:hover{
+    transform: scale(1.05);
+    border-color: #b02e72;
+    box-shadow: 0 8px 25px rgba(176,46,114,0.3);
+  }
+  .gallery-image.selected{
+    border-color: #b02e72;
+    box-shadow: 0 0 0 3px rgba(176,46,114,0.3);
+    transform: scale(1.05);
+  }
+  .no-images{
+    text-align: center;
+    color: #999;
+    font-style: italic;
+    padding: 2rem;
+  }
+
   /* ADD PRODUCT FORM */
   .product-form-grid{
     display:grid;
@@ -152,6 +214,20 @@
   }
   .form-row-full{
     grid-column:1/-1;
+  }
+  .selected-image-preview{
+    grid-column:1/-1;
+    text-align: center;
+    padding: 1.5rem;
+    background: #f8f5fd;
+    border-radius: 12px;
+    border: 2px solid #f2c9e3;
+  }
+  .preview-image{
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(176,46,114,0.2);
   }
 
   /* BUTTONS */
@@ -261,10 +337,11 @@
     gap:1rem;
   }
 
-  /* RESPONSIVE IMPROVEMENTS */
+  /* RESPONSIVE */
   @media(max-width:1024px){
     .page-wrap{padding:1.25rem;}
     .dashboard-grid{grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:1.25rem;}
+    .image-gallery{grid-template-columns:repeat(auto-fill, minmax(100px, 1fr));}
   }
   
   @media(max-width:768px){
@@ -273,6 +350,7 @@
     .section{padding:1.75rem 1.5rem;}
     .dashboard-grid{grid-template-columns:repeat(2, 1fr); gap:1rem;}
     .product-form-grid{grid-template-columns:1fr; gap:1.25rem;}
+    .image-gallery{grid-template-columns:repeat(3, 1fr);}
   }
   
   @media(max-width:480px){
@@ -285,17 +363,21 @@
     .products-table th, .products-table td{padding:1rem 0.75rem;}
     .products-table{font-size:0.9rem;}
     .section-header{flex-direction:column; align-items:stretch;}
+    .image-gallery{grid-template-columns:repeat(2, 1fr);}
+    .image-upload-section{padding:1.5rem;}
   }
   
   @media(max-width:360px){
     .products-table th, .products-table td{padding:0.75rem 0.5rem;}
     .dash-card{padding:1.5rem 1rem;}
+    .image-gallery{grid-template-columns:1fr;}
   }
 
   /* TOUCH FRIENDLY */
   @media(hover: none) and (pointer: coarse){
     .btn:active{transform:translateY(-2px) scale(0.98);}
     .dash-card:active{transform:translateY(-4px);}
+    .gallery-image:active{transform:scale(0.98);}
   }
 </style>
 </head>
@@ -324,9 +406,9 @@
       <div class="dash-label">Total Products</div>
     </div>
     <div class="dash-card">
-      <div class="dash-icon">📦</div>
-      <div class="dash-number" id="totalCategories">0</div>
-      <div class="dash-label">Categories</div>
+      <div class="dash-icon">📸</div>
+      <div class="dash-number" id="totalImages">0</div>
+      <div class="dash-label">Gallery Images</div>
     </div>
     <div class="dash-card">
       <div class="dash-icon">💰</div>
@@ -335,8 +417,8 @@
     </div>
     <div class="dash-card">
       <div class="dash-icon">📊</div>
-      <div class="dash-number" id="totalVisitors">0</div>
-      <div class="dash-label">Products Added</div>
+      <div class="dash-number" id="totalCategories">0</div>
+      <div class="dash-label">Categories</div>
     </div>
   </div>
 
@@ -345,6 +427,32 @@
     <div class="section-header">
       <h2 class="section-title">➕ Add New Product</h2>
     </div>
+
+    <!-- 🔥 IMAGE UPLOAD GALLERY -->
+    <div class="image-upload-section" onclick="document.getElementById('imageUpload').click()">
+      <div class="upload-icon">📸</div>
+      <strong>Click to upload or drag images here</strong><br>
+      <small style="color:#999;">Supported: JPG, PNG, WebP (Max 5MB)</small>
+      <input type="file" id="imageUpload" accept="image/*" multiple style="display:none;" onchange="handleImageUpload(event)">
+    </div>
+
+    <!-- IMAGE GALLERY -->
+    <div id="imageGallery" style="display:none;">
+      <div style="margin-bottom:1rem;">
+        <strong>📷 Select Image:</strong> 
+        <span id="selectedImageName" style="color:#b02e72; font-weight:700;"></span>
+        <button class="btn btn-secondary" onclick="clearImageSelection()" style="margin-left:1rem; padding:0.5rem 1rem; font-size:0.85rem;">Clear Selection</button>
+      </div>
+      <div class="image-gallery" id="galleryImages"></div>
+    </div>
+
+    <!-- SELECTED IMAGE PREVIEW -->
+    <div id="imagePreview" class="selected-image-preview" style="display:none;">
+      <h4 style="color:#9b1b63; margin-bottom:1rem;">✅ Selected Image Preview</h4>
+      <img id="previewImage" class="preview-image" src="" alt="Selected">
+    </div>
+
+    <!-- PRODUCT FORM -->
     <form id="addProductForm" class="product-form-grid">
       <div class="form-group">
         <label class="form-label">Product Name *</label>
@@ -367,9 +475,9 @@
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Image URL</label>
-        <input type="url" id="productImage" class="form-input" 
-               placeholder="https://example.com/image.jpg">
+        <label class="form-label">Image URL (Auto-filled from gallery)</label>
+        <input type="url" id="productImage" class="form-input" readonly 
+               placeholder="Image will be selected from gallery above">
       </div>
       <div class="form-group">
         <label class="form-label">Description</label>
@@ -416,8 +524,11 @@
 
 <script>
   const STORAGE_KEY = "kartiki_products";
+  const IMAGES_KEY = "kartiki_images";
+  let uploadedImages = [];
+  let selectedImageUrl = '';
 
-  // Load products
+  // Load data
   function loadProducts(){
     try{
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -428,10 +539,119 @@
     }
   }
 
+  function loadImages(){
+    try{
+      const raw = localStorage.getItem(IMAGES_KEY);
+      return raw ? JSON.parse(raw) : [];
+    }catch(e){
+      console.error("Error loading images:", e);
+      return [];
+    }
+  }
+
+  function saveImages(images){
+    localStorage.setItem(IMAGES_KEY, JSON.stringify(images));
+    renderImageGallery();
+    updateDashboard();
+  }
+
+  // 🔥 IMAGE UPLOAD & GALLERY
+  function handleImageUpload(event){
+    const files = Array.from(event.target.files);
+    const newImages = [];
+
+    files.forEach(file => {
+      if(file.type.startsWith('image/') && file.size < 5 * 1024 * 1024){ // 5MB limit
+        const reader = new FileReader();
+        reader.onload = function(e){
+          newImages.push({
+            id: Date.now() + Math.random(),
+            url: e.target.result,
+            name: file.name,
+            size: file.size
+          });
+          
+          if(newImages.length === files.length){
+            uploadedImages = [...uploadedImages, ...newImages];
+            saveImages(uploadedImages);
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  // Drag & Drop
+  const uploadSection = document.querySelector('.image-upload-section');
+  uploadSection.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    uploadSection.classList.add('dragover');
+  });
+  uploadSection.addEventListener('dragleave', () => {
+    uploadSection.classList.remove('dragover');
+  });
+  uploadSection.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadSection.classList.remove('dragover');
+    const files = Array.from(e.dataTransfer.files);
+    const dt = new DataTransfer();
+    files.forEach(file => dt.items.add(file));
+    document.getElementById('imageUpload').files = dt.files;
+    handleImageUpload({target: document.getElementById('imageUpload')});
+  });
+
+  function renderImageGallery(){
+    const gallery = document.getElementById('galleryImages');
+    const galleryContainer = document.getElementById('imageGallery');
+    
+    if(uploadedImages.length === 0){
+      gallery.innerHTML = '<div class="no-images">📸 No images uploaded yet. Upload some product photos!</div>';
+      galleryContainer.style.display = 'none';
+      return;
+    }
+
+    gallery.innerHTML = uploadedImages.map(img => `
+      <img src="${img.url}" 
+           alt="${img.name}" 
+           class="gallery-image ${selectedImageUrl === img.url ? 'selected' : ''}"
+           onclick="selectImage('${img.url}', '${img.name}')"
+           title="${img.name} (${(img.size/1024).toFixed(1)}KB)">
+    `).join('');
+    
+    galleryContainer.style.display = 'block';
+    document.getElementById('totalImages').textContent = uploadedImages.length;
+  }
+
+  function selectImage(url, name){
+    selectedImageUrl = url;
+    document.getElementById('productImage').value = url;
+    document.getElementById('selectedImageName').textContent = name;
+    
+    // Update preview
+    const preview = document.getElementById('imagePreview');
+    const previewImg = document.getElementById('previewImage');
+    previewImg.src = url;
+    preview.style.display = 'block';
+    
+    // Update gallery selection
+    document.querySelectorAll('.gallery-image').forEach(img => {
+      img.classList.remove('selected');
+      if(img.src === url) img.classList.add('selected');
+    });
+  }
+
+  function clearImageSelection(){
+    selectedImageUrl = '';
+    document.getElementById('productImage').value = '';
+    document.getElementById('selectedImageName').textContent = '';
+    document.getElementById('imagePreview').style.display = 'none';
+    document.querySelectorAll('.gallery-image').forEach(img => img.classList.remove('selected'));
+  }
+
   // Save products
   function saveProducts(products){
     localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
-    renderDashboard();
+    updateDashboard();
     renderProductsTable();
   }
 
@@ -439,12 +659,17 @@
   document.getElementById('addProductForm').addEventListener('submit', function(e){
     e.preventDefault();
     
+    if(!selectedImageUrl && !document.getElementById('productImage').value){
+      alert('⚠️ Please select an image from gallery or enter URL');
+      return;
+    }
+    
     const product = {
       id: Date.now(),
       name: document.getElementById('productName').value.trim(),
       price: parseFloat(document.getElementById('productPrice').value),
       category: document.getElementById('productCategory').value,
-      image: document.getElementById('productImage').value.trim() || '',
+      image: selectedImageUrl || document.getElementById('productImage').value.trim(),
       description: document.getElementById('productDescription').value.trim()
     };
 
@@ -452,11 +677,12 @@
     products.push(product);
     saveProducts(products);
 
-    // Reset form with success feedback
+    // Reset form
     this.reset();
+    clearImageSelection();
     const submitBtn = this.querySelector('.btn-primary');
     const originalText = submitBtn.textContent;
-    submitBtn.textContent = '✅ Added!';
+    submitBtn.textContent = '✅ Product Added!';
     submitBtn.style.background = '#4CAF50';
     setTimeout(() => {
       submitBtn.textContent = originalText;
@@ -473,8 +699,8 @@
     }
   }
 
-  // Render dashboard stats
-  function renderDashboard(){
+  // Update dashboard
+  function updateDashboard(){
     const products = loadProducts();
     const categories = [...new Set(products.map(p => p.category).filter(Boolean))];
     
@@ -482,7 +708,6 @@
     document.getElementById('totalCategories').textContent = categories.length || 0;
     document.getElementById('totalRevenue').textContent = 
       '₹' + products.reduce((sum, p) => sum + (p.price || 0), 0).toLocaleString('en-IN');
-    document.getElementById('totalVisitors').textContent = products.length;
   }
 
   // Render products table
@@ -495,7 +720,7 @@
         <tr>
           <td colspan="6" class="no-products">
             🚀 <strong>Add your first product</strong> using the form above!<br>
-            <small>Products will appear here and on your main website instantly.</small>
+            <small>📸 Upload images first, then create products!</small>
           </td>
         </tr>
       `;
@@ -532,21 +757,25 @@
   function clearAllProducts(){
     if(confirm('⚠️ Delete ALL products? This action cannot be undone!\n\nAll products will be permanently removed from your website.')){
       localStorage.removeItem(STORAGE_KEY);
-      renderDashboard();
+      updateDashboard();
       renderProductsTable();
     }
   }
 
   // Refresh data
   function refreshData(){
-    renderDashboard();
+    uploadedImages = loadImages();
+    updateDashboard();
     renderProductsTable();
+    renderImageGallery();
   }
 
   // Initialize
   document.addEventListener('DOMContentLoaded', function(){
-    renderDashboard();
+    uploadedImages = loadImages();
+    updateDashboard();
     renderProductsTable();
+    renderImageGallery();
   });
 </script>
 </body>
