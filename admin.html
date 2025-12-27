@@ -116,6 +116,47 @@
     flex-wrap:wrap;
   }
 
+  /* CATEGORY MANAGEMENT */
+  .category-management{
+    background: linear-gradient(135deg, #fff8fd 0%, #fef2fc 100%);
+    border: 2px dashed #f2c9e3;
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+  }
+  .category-input-group{
+    display: flex;
+    gap: 1rem;
+    align-items: end;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .category-input-group input{
+    flex: 1;
+    min-width: 200px;
+  }
+  .categories-list{
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #f2c9e3;
+    border-radius: 10px;
+    padding: 1rem;
+    background: #fff;
+  }
+  .category-item{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #fff5fd, #ffe8f5);
+    border-radius: 10px;
+    border-left: 4px solid #b02e72;
+  }
+  .category-item:last-child{
+    margin-bottom: 0;
+  }
+
   /* IMAGE UPLOAD SECTION */
   .image-upload-section{
     background: linear-gradient(135deg, #fff8fd 0%, #fef2fc 100%);
@@ -246,6 +287,10 @@
     justify-content:center;
     white-space:nowrap;
   }
+  .btn-small{
+    padding:0.6rem 1.2rem;
+    font-size:0.85rem;
+  }
   .btn-primary{
     background:linear-gradient(135deg, #b02e72, #8b1a62);
     color:#fff;
@@ -273,6 +318,13 @@
   .btn-danger:hover,.btn-danger:active{
     background:#d32f2f;
     transform:translateY(-2px);
+  }
+  .btn-success{
+    background:#4CAF50;
+    color:#fff;
+  }
+  .btn-success:hover{
+    background:#45a049;
   }
 
   /* PRODUCTS TABLE */
@@ -351,6 +403,7 @@
     .dashboard-grid{grid-template-columns:repeat(2, 1fr); gap:1rem;}
     .product-form-grid{grid-template-columns:1fr; gap:1.25rem;}
     .image-gallery{grid-template-columns:repeat(3, 1fr);}
+    .category-input-group{flex-direction: column; align-items: stretch;}
   }
   
   @media(max-width:480px){
@@ -428,6 +481,25 @@
       <h2 class="section-title">➕ Add New Product</h2>
     </div>
 
+    <!-- 🔥 CUSTOM CATEGORY MANAGEMENT -->
+    <div class="category-management">
+      <h3 style="color:#9b1b63; margin-bottom:1rem;">🏷️ Manage Categories</h3>
+      <div class="category-input-group">
+        <div class="form-group" style="flex:1;">
+          <label class="form-label">Add New Category</label>
+          <input type="text" id="newCategoryInput" class="form-input" placeholder="Ex: Wall Art, Trays" maxlength="30">
+        </div>
+        <button class="btn btn-success btn-small" onclick="addCategory()">
+          ➕ Add Category
+        </button>
+      </div>
+      <div class="categories-list" id="categoriesList">
+        <div style="color:#999; font-style:italic; padding:1rem; text-align:center;">
+          No custom categories added yet
+        </div>
+      </div>
+    </div>
+
     <!-- 🔥 IMAGE UPLOAD GALLERY -->
     <div class="image-upload-section" onclick="document.getElementById('imageUpload').click()">
       <div class="upload-icon">📸</div>
@@ -441,7 +513,7 @@
       <div style="margin-bottom:1rem;">
         <strong>📷 Select Image:</strong> 
         <span id="selectedImageName" style="color:#b02e72; font-weight:700;"></span>
-        <button class="btn btn-secondary" onclick="clearImageSelection()" style="margin-left:1rem; padding:0.5rem 1rem; font-size:0.85rem;">Clear Selection</button>
+        <button class="btn btn-secondary btn-small" onclick="clearImageSelection()" style="margin-left:1rem;">Clear Selection</button>
       </div>
       <div class="image-gallery" id="galleryImages"></div>
     </div>
@@ -468,10 +540,6 @@
         <label class="form-label">Category *</label>
         <select id="productCategory" class="form-select" required>
           <option value="">Select Category</option>
-          <option value="coasters">☕ Coasters</option>
-          <option value="jewellery">💍 Jewellery</option>
-          <option value="keychains">🔗 Keychains</option>
-          <option value="pooja thali">🛕 Pooja Thali</option>
         </select>
       </div>
       <div class="form-group">
@@ -525,8 +593,10 @@
 <script>
   const STORAGE_KEY = "kartiki_products";
   const IMAGES_KEY = "kartiki_images";
+  const CATEGORIES_KEY = "kartiki_categories";
   let uploadedImages = [];
   let selectedImageUrl = '';
+  let customCategories = [];
 
   // Load data
   function loadProducts(){
@@ -549,10 +619,111 @@
     }
   }
 
+  function loadCategories(){
+    try{
+      const raw = localStorage.getItem(CATEGORIES_KEY);
+      return raw ? JSON.parse(raw) : [];
+    }catch(e){
+      console.error("Error loading categories:", e);
+      return [];
+    }
+  }
+
+  function saveCategories(categories){
+    localStorage.setItem(CATEGORIES_KEY, JSON.stringify(categories));
+  }
+
   function saveImages(images){
     localStorage.setItem(IMAGES_KEY, JSON.stringify(images));
     renderImageGallery();
     updateDashboard();
+  }
+
+  // 🔥 CATEGORY MANAGEMENT
+  function addCategory(){
+    const input = document.getElementById('newCategoryInput');
+    const categoryName = input.value.trim();
+    
+    if(!categoryName){
+      alert('⚠️ Please enter a category name');
+      input.focus();
+      return;
+    }
+    
+    if(categoryName.length > 30){
+      alert('⚠️ Category name must be less than 30 characters');
+      return;
+    }
+    
+    if(customCategories.includes(categoryName)){
+      alert('⚠️ Category already exists!');
+      return;
+    }
+    
+    customCategories.push(categoryName);
+    saveCategories(customCategories);
+    renderCategoriesList();
+    updateProductCategoryDropdown();
+    input.value = '';
+    
+    // Success feedback
+    const btn = event.target;
+    const originalText = btn.textContent;
+    btn.textContent = '✅ Added!';
+    btn.style.background = '#4CAF50';
+    setTimeout(() => {
+      btn.textContent = originalText;
+      btn.style.background = '';
+    }, 1500);
+  }
+
+  function deleteCategory(categoryName){
+    if(confirm(`🗑️ Delete "${categoryName}" category?\n\nProducts using this category will still work but won't show in dropdown.`)){
+      customCategories = customCategories.filter(cat => cat !== categoryName);
+      saveCategories(customCategories);
+      renderCategoriesList();
+      updateProductCategoryDropdown();
+    }
+  }
+
+  function renderCategoriesList(){
+    const container = document.getElementById('categoriesList');
+    
+    if(customCategories.length === 0){
+      container.innerHTML = '<div style="color:#999; font-style:italic; padding:1rem; text-align:center;">No custom categories added yet</div>';
+      return;
+    }
+    
+    container.innerHTML = customCategories.map(category => `
+      <div class="category-item">
+        <span style="font-weight:600; color:#9b1b63;">${category}</span>
+        <button class="btn btn-danger btn-small" onclick="deleteCategory('${category}')" title="Delete Category">
+          🗑️
+        </button>
+      </div>
+    `).join('');
+  }
+
+  function updateProductCategoryDropdown(){
+    const select = document.getElementById('productCategory');
+    const defaultCategories = [
+      {value: "coasters", label: "☕ Coasters"},
+      {value: "jewellery", label: "💍 Jewellery"},
+      {value: "keychains", label: "🔗 Keychains"},
+      {value: "pooja thali", label: "🛕 Pooja Thali"}
+    ];
+    
+    // Add default categories
+    let options = defaultCategories.map(cat => 
+      `<option value="${cat.value}">${cat.label}</option>`
+    );
+    
+    // Add custom categories
+    options = options.concat(
+      customCategories.map(cat => `<option value="${cat}">${cat}</option>`)
+    );
+    
+    select.innerHTML = `<option value="">Select Category</option>` + options.join('');
   }
 
   // 🔥 IMAGE UPLOAD & GALLERY
@@ -702,10 +873,10 @@
   // Update dashboard
   function updateDashboard(){
     const products = loadProducts();
-    const categories = [...new Set(products.map(p => p.category).filter(Boolean))];
+    const allCategories = [...new Set(products.map(p => p.category).filter(Boolean))];
     
     document.getElementById('totalProducts').textContent = products.length;
-    document.getElementById('totalCategories').textContent = categories.length || 0;
+    document.getElementById('totalCategories').textContent = allCategories.length || 0;
     document.getElementById('totalRevenue').textContent = 
       '₹' + products.reduce((sum, p) => sum + (p.price || 0), 0).toLocaleString('en-IN');
   }
@@ -743,7 +914,7 @@
         <td>${(product.description || 'No description').substring(0, 60)}${(product.description || '').length > 60 ? '...' : ''}</td>
         <td>
           <div class="action-buttons">
-            <button class="btn btn-danger" style="padding:0.5rem 1rem;font-size:0.85rem;" 
+            <button class="btn btn-danger btn-small" 
                     onclick="deleteProduct(${product.id})">
               🗑️ Delete
             </button>
@@ -765,17 +936,30 @@
   // Refresh data
   function refreshData(){
     uploadedImages = loadImages();
+    customCategories = loadCategories();
     updateDashboard();
     renderProductsTable();
     renderImageGallery();
+    renderCategoriesList();
+    updateProductCategoryDropdown();
   }
 
   // Initialize
   document.addEventListener('DOMContentLoaded', function(){
     uploadedImages = loadImages();
+    customCategories = loadCategories();
     updateDashboard();
     renderProductsTable();
     renderImageGallery();
+    renderCategoriesList();
+    updateProductCategoryDropdown();
+    
+    // Enter key support for category input
+    document.getElementById('newCategoryInput').addEventListener('keypress', function(e){
+      if(e.key === 'Enter'){
+        addCategory();
+      }
+    });
   });
 </script>
 </body>
