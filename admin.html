@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin Panel - Kartiki Resin Arts</title>
+<style>
+  *{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+  }
+
+  body{
+    font-family:system-ui,-apple-system,sans-serif;
+    background: linear-gradient(135deg, #fff4fb 0%, #fce8fb 100%);
+    min-height:100vh;
+    color:#333;
+  }
+
+  /* PASSWORD MODAL */
+  .password-modal{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.7);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:10000;
+    backdrop-filter:blur(10px);
+  }
+  .password-modal.hidden{
+    display:none;
+  }
+  .password-container{
+    background:#fff;
+    border-radius:25px;
+    padding:3rem 2.5rem;
+    text-align:center;
+    box-shadow:0 30px 80px rgba(176,46,114,0.5);
+    border:3px solid #f3d2f0;
+    max-width:450px;
+    width:90%;
+    animation:modalSlideIn 0.4s ease-out;
+  }
+  @keyframes modalSlideIn{
+    from{transform:translateY(-50px) scale(0.9); opacity:0;}
+    to{transform:translateY(0) scale(1); opacity:1;}
+  }
+  .password-lock-icon{
+    font-size:5rem;
+    background:linear-gradient(135deg, #b02e72, #8b1a62);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    background-clip:text;
+    margin-bottom:1.5rem;
+    display:block;
+  }
+  .password-title{
+    font-size:clamp(1.5rem, 5vw, 2rem);
+    font-weight:800;
+    color:#9b1b63;
+    margin-bottom:1rem;
+  }
+  .password-subtitle{
+    color:#666;
+    margin-bottom:2rem;
+    font-size:1.1rem;
+  }
+  .password-input-group{
+    position:relative;
+    margin-bottom:2rem;
+  }
+  .password-input{
+    width:100%;
+    padding:1.5rem 1.5rem 1.5rem 3rem;
+    border:3px solid #f2c9e3;
+    border-radius:15px;
+    font-size:1.2rem;
+    font-weight:600;
+    background:#fff;
+    transition:all 0.3s ease;
+    font-family:inherit;
+  }
+  .password-input:focus{
+    outline:none;
+    border-color:#b02e72;
+    box-shadow:0 0 0 4px rgba(176,46,114,0.2);
+    transform:scale(1.02);
+  }
+  .password-icon{
+    position:absolute;
+    left:1.2rem;
+    top:50%;
+    transform:translateY(-50%);
+    font-size:1.4rem;
+    color:#b02e72;
+  }
+  .password-error{
+    color:#f44336;
+    font-size:0.9rem;
+    margin-top:0.5rem;
+    display:none;
+  }
+  .password-actions{
+    display:flex;
+    gap:1rem;
+    justify-content:center;
+    flex-wrap:wrap;
+  }
+
+  .page-wrap{
+    max-width:1400px;
+    margin:0 auto;
+    padding:1.5rem;
+  }
+
+  /* HEADER */
+  .admin-header{
+    background: linear-gradient(135deg, #b02e72, #8b1a62);
+    color:#fff;
+    padding:2rem 1.5rem;
+    border-radius:25px;
+    text-align:center;
+    margin-bottom:2.5rem;
+    box-shadow:0 20px 60px rgba(176,46,114,0.4);
+  }
+  .admin-header h1{
+    font-size:clamp(1.5rem, 4vw, 2.2rem);
+    font-weight:800;
+    margin-bottom:0.5rem;
+  }
+  .admin-header p{
+    font-size:clamp(0.95rem, 2.5vw, 1.1rem);
+    opacity:0.95;
+    margin-bottom:1rem;
+  }
+  .admin-header .btn-container{
+    display:flex;
+    gap:1rem;
+    justify-content:center;
+    flex-wrap:wrap;
+  }
+
+  /* DASHBOARD CARDS */
+  .dashboard-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));
+    gap:1.5rem;
+    margin-bottom:2.5rem;
+  }
+  .dash-card{
+    background:#fff;
+    border-radius:20px;
+    padding:2rem 1.5rem;
+    box-shadow:0 15px 45px rgba(191,72,134,0.2);
+    border:2px solid #f3d2f0;
+    transition:all 0.3s ease;
+    text-align:center;
+  }
+  .dash-card:hover{
+    transform:translateY(-8px);
+    box-shadow:0 25px 65px rgba(176,46,114,0.35);
+    border-color:#b02e72;
+  }
+  .dash-icon{
+    width:65px;
+    height:65px;
+    border-radius:50%;
+    background:linear-gradient(135deg, #b02e72, #8b1a62);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#fff;
+    font-size:1.8rem;
+    margin:0 auto 1rem auto;
+  }
+  .dash-number{
+    font-size:clamp(1.8rem, 6vw, 2.5rem);
+    font-weight:800;
+    color:#b02e72;
+    margin-bottom:0.3rem;
+  }
+  .dash-label{
+    font-size:1rem;
+    color:#9b1b63;
+    font-weight:700;
+  }
+
+  /* MAIN SECTIONS */
+  .section{
+    background:#fff;
+    border-radius:20px;
+    padding:2.5rem 2rem;
+    margin-bottom:2rem;
+    box-shadow:0 15px 45px rgba(191,72,134,0.15);
+    border:2px solid #f3d2f0;
+  }
+  .section-title{
+    font-size:clamp(1.4rem, 4vw, 1.8rem);
+    font-weight:800;
+    color:#9b1b63;
+    margin-bottom:1.5rem;
+    display:flex;
+    align-items:center;
+    gap:0.8rem;
+    flex-wrap:wrap;
+  }
+
+  /* CATEGORY MANAGEMENT */
+  .category-management{
+    background: linear-gradient(135deg, #fff8fd 0%, #fef2fc 100%);
+    border: 2px dashed #f2c9e3;
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+  }
+  .category-input-group{
+    display: flex;
+    gap: 1rem;
+    align-items: end;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .category-input-group input{
+    flex: 1;
+    min-width: 200px;
+  }
+  .categories-list{
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #f2c9e3;
+    border-radius: 10px;
+    padding: 1rem;
+    background: #fff;
+  }
+  .category-item{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #fff5fd, #ffe8f5);
+    border-radius: 10px;
+    border-left: 4px solid #b02e72;
+  }
+  .category-item:last-child{
+    margin-bottom: 0;
+  }
+
+  /* IMAGE UPLOAD SECTION */
+  .image-upload-section{
+    background: linear-gradient(135deg, #fff8fd 0%, #fef2fc 100%);
+    border: 2px dashed #f2c9e3;
+    border-radius: 15px;
+    padding: 2rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  .image-upload-section:hover{
+    border-color: #b02e72;
+    background: linear-gradient(135deg, #fff5fd 0%, #fef0fc 100%);
+    transform: scale(1.02);
+  }
+  .image-upload-section.dragover{
+    border-color: #b02e72 !important;
+    background: linear-gradient(135deg, #fff0fb 0%, #fef0fc 100%);
+    box-shadow: 0 0 0 3px rgba(176,46,114,0.2);
+  }
+  .upload-icon{
+    font-size: 4rem;
+    background: linear-gradient(135deg, #b02e72, #8b1a62);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+    display: block;
+  }
+  .image-gallery{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  .gallery-image{
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 3px solid #f3d2f0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .gallery-image:hover{
+    transform: scale(1.05);
+    border-color: #b02e72;
+    box-shadow: 0 8px 25px rgba(176,46,114,0.3);
+  }
+  .gallery-image.selected{
+    border-color: #b02e72;
+    box-shadow: 0 0 0 3px rgba(176,46,114,0.3);
+    transform: scale(1.05);
+  }
+  .no-images{
+    text-align: center;
+    color: #999;
+    font-style: italic;
+    padding: 2rem;
+  }
+
+  /* ADD PRODUCT FORM */
+  .product-form-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));
+    gap:1.5rem;
+    margin-bottom:2rem;
+  }
+  .form-group{
+    display:flex;
+    flex-direction:column;
+    gap:0.5rem;
+  }
+  .form-label{
+    font-weight:700;
+    color:#555;
+    font-size:clamp(0.85rem, 2.5vw, 0.95rem);
+  }
+  .form-input, .form-textarea, .form-select{
+    padding:1rem 1.2rem;
+    border:2px solid #f2c9e3;
+    border-radius:12px;
+    font-size:1rem;
+    transition:all 0.3s ease;
+    font-family:inherit;
+  }
+  .form-input:focus, .form-textarea:focus, .form-select:focus{
+    outline:none;
+    border-color:#b02e72;
+    box-shadow:0 0 0 3px rgba(176,46,114,0.15);
+  }
+  .form-textarea{
+    min-height:100px;
+    resize:vertical;
+  }
+  .form-row-full{
+    grid-column:1/-1;
+  }
+  .selected-image-preview{
+    grid-column:1/-1;
+    text-align: center;
+    padding: 1.5rem;
+    background: #f8f5fd;
+    border-radius: 12px;
+    border: 2px solid #f2c9e3;
+  }
+  .preview-image{
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(176,46,114,0.2);
+  }
+
+  /* BUTTONS */
+  .btn{
+    padding:clamp(0.8rem, 3vw, 1rem) clamp(1.5rem, 4vw, 2rem);
+    border-radius:15px;
+    font-weight:700;
+    font-size:clamp(0.9rem, 3vw, 1.1rem);
+    cursor:pointer;
+    border:none;
+    transition:all 0.3s ease;
+    display:inline-flex;
+    align-items:center;
+    gap:0.7rem;
+    text-decoration:none;
+    justify-content:center;
+    white-space:nowrap;
+  }
+  .btn-small{
+    padding:0.6rem 1.2rem;
+    font-size:0.85rem;
+  }
+  .btn-primary{
+    background:linear-gradient(135deg, #b02e72, #8b1a62);
+    color:#fff;
+    box-shadow:0 10px 30px rgba(176,46,114,0.4);
+  }
+  .btn-primary:hover,.btn-primary:active{
+    transform:translateY(-3px);
+    box-shadow:0 18px 40px rgba(176,46,114,0.5);
+  }
+  .btn-secondary{
+    background:#fff;
+    color:#b02e72;
+    border:3px solid #f2c9e3;
+    font-weight:800;
+  }
+  .btn-secondary:hover,.btn-secondary:active{
+    background:#b02e72;
+    color:#fff;
+    transform:translateY(-2px);
+  }
+  .btn-danger{
+    background:#f44336;
+    color:#fff;
+  }
+  .btn-danger:hover,.btn-danger:active{
+    background:#d32f2f;
+    transform:translateY(-2px);
+  }
+  .btn-success{
+    background:#4CAF50;
+    color:#fff;
+  }
+  .btn-success:hover{
+    background:#45a049;
+  }
+
+  /* PRODUCTS TABLE */
+  .products-table-wrapper{
+    overflow-x:auto;
+    border-radius:15px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.1);
+    margin-top:1.5rem;
+  }
+  .products-table{
+    width:100%;
+    min-width:600px;
+    border-collapse:collapse;
+    background:#fff;
+  }
+  .products-table th{
+    background:linear-gradient(135deg, #b02e72, #8b1a62);
+    color:#fff;
+    padding:1.2rem 1rem;
+    text-align:left;
+    font-weight:700;
+    font-size:0.95rem;
+    position:sticky;
+    top:0;
+    z-index:10;
+  }
+  .products-table td{
+    padding:1.2rem 1rem;
+    border-bottom:1px solid #f3d2f0;
+    vertical-align:top;
+  }
+  .products-table tr:hover{
+    background:rgba(176,46,114,0.05);
+  }
+  .price-badge{
+    background:linear-gradient(135deg, #fff5fd, #ffe8f5);
+    color:#b02e72;
+    padding:0.4rem 0.8rem;
+    border-radius:20px;
+    font-weight:700;
+    font-size:0.9rem;
+    white-space:nowrap;
+  }
+  .no-products{
+    text-align:center;
+    padding:3rem 1rem;
+    color:#999;
+  }
+
+  .section-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:1.5rem;
+    flex-wrap:wrap;
+    gap:1rem;
+  }
+
+  @media(max-width:768px){
+    .password-container{padding:2rem 1.5rem;}
+    .password-actions{flex-direction:column;}
+    .page-wrap{padding:1rem;}
+    .category-input-group{flex-direction: column; align-items: stretch;}
+  }
+
+  @media(hover: none) and (pointer: coarse){
+    .btn:active{transform:translateY(-2px) scale(0.98);}
+    .dash-card:active{transform:translateY(-4px);}
+    .gallery-image:active{transform:scale(0.98);}
+  }
+</style>
+</head>
+<body>
+
+<div class="password-modal" id="passwordModal">
+  <div class="password-container">
+    <div class="password-lock-icon">🔐</div>
+    <h2 class="password-title">Admin Access Required</h2>
+    <p class="password-subtitle">Enter password to access Kartiki Resin Arts Admin Panel</p>
+    <div class="password-input-group">
+      <span class="password-icon">🔑</span>
+      <input type="password" id="adminPassword" class="password-input" placeholder="Enter admin password" maxlength="20">
+      <div class="password-error" id="passwordError">❌ Incorrect password!</div>
+    </div>
+    <div class="password-actions">
+      <button class="btn btn-primary" onclick="checkPassword()">✅ Unlock Admin</button>
+      <button class="btn btn-secondary" onclick="window.location.href='index.html'">🏠 Go to Website</button>
+    </div>
+  </div>
+</div>
+
+<div class="page-wrap" id="mainContent" style="display:none;">
+
+  <header class="admin-header">
+    <h1>🔐 Admin Dashboard</h1>
+    <p>Kartiki Resin Arts - Manage Products & Orders</p>
+    <div class="btn-container">
+      <button class="btn btn-secondary" onclick="window.location.href='index.html'">🏠 Back to Website</button>
+      <button class="btn btn-primary" onclick="refreshData()">🔄 Refresh Data</button>
+    </div>
+  </header>
+
+  <div class="dashboard-grid">
+    <div class="dash-card">
+      <div class="dash-icon">🛍️</div>
+      <div class="dash-number" id="totalProducts">0</div>
+      <div class="dash-label">Total Products</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-icon">📸</div>
+      <div class="dash-number" id="totalImages">0</div>
+      <div class="dash-label">Gallery Images</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-icon">💰</div>
+      <div class="dash-number" id="totalRevenue">₹0</div>
+      <div class="dash-label">Total Value</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-icon">📊</div>
+      <div class="dash-number" id="totalCategories">0</div>
+      <div class="dash-label">Categories</div>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="section-header">
+      <h2 class="section-title">➕ Add New Product</h2>
+    </div>
+
+    <div class="category-management">
+      <h3 style="color:#9b1b63; margin-bottom:1rem;">🏷️ Manage Categories</h3>
+      <div class="category-input-group">
+        <div class="form-group" style="flex:1;">
+          <label class="form-label">Add New Category</label>
+          <input type="text" id="newCategoryInput" class="form-input" placeholder="Ex: Wall Art, Trays" maxlength="30">
+        </div>
+        <button class="btn btn-success btn-small" onclick="addCategory()">➕ Add Category</button>
+      </div>
+      <div class="categories-list" id="categoriesList">
+        <div style="color:#999; font-style:italic; padding:1rem; text-align:center;">
+          No custom categories added yet
+        </div>
+      </div>
+    </div>
+
+    <div class="image-upload-section" onclick="document.getElementById('imageUpload').click()">
+      <div class="upload-icon">📸</div>
+      <strong>Click to upload or drag images here <span style="color:#b02e72; font-weight:700;">*</span></strong><br>
+      <small style="color:#999;">Supported: JPG, PNG, WebP (Max 5MB) - Required for products</small>
+      <input type="file" id="imageUpload" accept="image/*" multiple style="display:none;" onchange="handleImageUpload(event)">
+    </div>
+
+    <div id="imageGallery" style="display:none;">
+      <div style="margin-bottom:1rem;">
+        <strong>📷 Select Image <span style="color:#b02e72; font-weight:700;">*</span>:</strong> 
+        <span id="selectedImageName" style="color:#b02e72; font-weight:700;"></span>
+        <button class="btn btn-secondary btn-small" onclick="clearImageSelection()" style="margin-left:1rem;">Clear Selection</button>
+      </div>
+      <div class="image-gallery" id="galleryImages"></div>
+    </div>
+
+    <div id="imagePreview" class="selected-image-preview" style="display:none;">
+      <h4 style="color:#9b1b63; margin-bottom:1rem;">✅ Selected Image Preview</h4>
+      <img id="previewImage" class="preview-image" src="" alt="Selected">
+    </div>
+
+    <form id="addProductForm" class="product-form-grid">
+      <div class="form-group">
+        <label class="form-label">Product Name <span style="color:#b02e72;">*</span></label>
+        <input type="text" id="productName" class="form-input" required maxlength="100">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Price (₹) <span style="color:#b02e72;">*</span></label>
+        <input type="number" id="productPrice" class="form-input" required min="0" step="0.01">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Category <span style="color:#b02e72;">*</span></label>
+        <select id="productCategory" class="form-select" required>
+          <option value="">Select Category (Add first!)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea id="productDescription" class="form-textarea" maxlength="500"></textarea>
+      </div>
+      <div class="form-row-full">
+        <button type="submit" class="btn btn-primary">✅ Add Product Now</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="section">
+    <div class="section-header">
+      <h2 class="section-title">📋 All Products</h2>
+      <button class="btn btn-danger" onclick="clearAllProducts()">🗑️ Clear All Products</button>
+    </div>
+    <div class="products-table-wrapper">
+      <table class="products-table" id="productsTable">
+        <thead>
+          <tr>
+            <th>Preview</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Category</th>
+            <th>Description</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="productsTableBody">
+          <tr>
+            <td colspan="6" class="no-products">
+              🚀 Add your first product using the form above!
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  const ADMIN_PASSWORD = "kartiki123";
+  const STORAGE_KEY = "kartiki_products";
+  const IMAGES_KEY = "kartiki_images";
+  const CATEGORIES_KEY = "kartiki_categories";
+
+  let uploadedImages = [];
+  let selectedImageUrl = "";
+  let customCategories = [];
+
+  function checkPassword(){
+    const input = document.getElementById('adminPassword');
+    const error = document.getElementById('passwordError');
+    if(input.value === ADMIN_PASSWORD){
+      document.getElementById('passwordModal').classList.add('hidden');
+      document.getElementById('mainContent').style.display = 'block';
+      input.value = '';
+      setTimeout(initAdminPanel, 300);
+    }else{
+      error.style.display = 'block';
+      input.style.borderColor = '#f44336';
+      input.style.boxShadow = '0 0 0 3px rgba(244,67,54,0.2)';
+      input.focus();
+      input.select();
+    }
+  }
+
+  function loadProducts(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    }catch(e){
+      return [];
+    }
+  }
+
+  function loadImages(){
+    try{
+      const raw = localStorage.getItem(IMAGES_KEY);
+      return raw ? JSON.parse(raw) : [];
+    }catch(e){
+      return [];
+    }
+  }
+
+  function loadCategories(){
+    try{
+      const raw = localStorage.getItem(CATEGORIES_KEY);
+      if(!raw) return [];
+      const data = JSON.parse(raw);
+      return Array.isArray(data)
+        ? data.filter(c => typeof c === 'string' && c.trim() !== '')
+        : [];
+    }catch(e){
+      return [];
+    }
+  }
+
+  function saveCategories(categories){
+    const clean = categories.filter(c => typeof c === 'string' && c.trim() !== '');
+    localStorage.setItem(CATEGORIES_KEY, JSON.stringify(clean));
+    customCategories = clean;
+    updateProductCategoryDropdown();
+    renderCategoriesList();
+    updateDashboard();
+  }
+
+  // 🔥 one-image-only logic
+  function saveImages(images){
+    // फक्त नवीन images ठेवा (जुने clear)
+    uploadedImages = images;
+    localStorage.setItem(IMAGES_KEY, JSON.stringify(uploadedImages));
+    renderImageGallery();
+    updateDashboard();
+  }
+
+  function saveProducts(products){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+    renderProductsTable();
+    updateDashboard();
+  }
+
+  function addCategory(){
+    const input = document.getElementById('newCategoryInput');
+    const name = input.value.trim();
+    if(!name){
+      alert("Please enter a category name");
+      return;
+    }
+    if(name.length > 30){
+      alert("Max 30 characters");
+      return;
+    }
+    if(customCategories.includes(name)){
+      alert("Category already exists");
+      return;
+    }
+    customCategories.push(name);
+    saveCategories(customCategories);
+    input.value = '';
+  }
+
+  function deleteCategory(name){
+    if(!confirm(`Delete category "${name}"?`)) return;
+    customCategories = customCategories.filter(c => c !== name);
+    saveCategories(customCategories);
+  }
+
+  function renderCategoriesList(){
+    const div = document.getElementById('categoriesList');
+    if(customCategories.length === 0){
+      div.innerHTML = '<div style="color:#999;font-style:italic;padding:1rem;text-align:center;">No custom categories added yet</div>';
+      return;
+    }
+    div.innerHTML = customCategories.map(cat => `
+      <div class="category-item">
+        <span style="font-weight:600;color:#9b1b63;">${cat}</span>
+        <button class="btn btn-danger btn-small" onclick="deleteCategory('${cat.replace(/'/g,"\\'")}')">🗑️</button>
+      </div>
+    `).join('');
+  }
+
+  function updateProductCategoryDropdown(){
+    const select = document.getElementById('productCategory');
+    const clean = customCategories.filter(c => typeof c === 'string' && c.trim() !== '');
+    const options = clean.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+    select.innerHTML = `<option value="">Select Category (Add first!)</option>` + options;
+  }
+
+  // ✅ Only latest uploaded image kept and shown
+  function handleImageUpload(e){
+    const files = Array.from(e.target.files);
+    const added = [];
+
+    files.forEach(file => {
+      if(file.type.startsWith('image/') && file.size < 5 * 1024 * 1024){
+        const reader = new FileReader();
+        reader.onload = ev => {
+          added.push({
+            id: Date.now() + Math.random(),
+            url: ev.target.result,
+            name: file.name,
+            size: file.size
+          });
+          if(added.length === files.length){
+            // फक्त नवीन images ठेवा
+            saveImages(added);
+            // auto select first image
+            selectImage(added[0].url, added[0].name);
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  function renderImageGallery(){
+    const wrap = document.getElementById('imageGallery');
+    const gallery = document.getElementById('galleryImages');
+    if(uploadedImages.length === 0){
+      gallery.innerHTML = '<div class="no-images">📸 No images uploaded yet.</div>';
+      wrap.style.display = 'none';
+      return;
+    }
+    const img = uploadedImages[0]; // फक्त एक image
+    gallery.innerHTML = `
+      <img src="${img.url}"
+           alt="${img.name}"
+           class="gallery-image ${selectedImageUrl === img.url ? 'selected' : ''}"
+           onclick="selectImage('${img.url.replace(/'/g,"\\'")}','${img.name.replace(/'/g,"\\'")}')">
+    `;
+    wrap.style.display = 'block';
+  }
+
+  function selectImage(url,name){
+    selectedImageUrl = url;
+    document.getElementById('selectedImageName').textContent = name;
+    const preview = document.getElementById('imagePreview');
+    document.getElementById('previewImage').src = url;
+    preview.style.display = 'block';
+    document.querySelectorAll('.gallery-image').forEach(img=>{
+      img.classList.toggle('selected', img.src === url);
+    });
+  }
+
+  function clearImageSelection(){
+    selectedImageUrl = '';
+    document.getElementById('selectedImageName').textContent = '';
+    document.getElementById('imagePreview').style.display = 'none';
+    document.querySelectorAll('.gallery-image').forEach(img=>img.classList.remove('selected'));
+  }
+
+  function renderProductsTable(){
+    const products = loadProducts();
+    const tbody = document.getElementById('productsTableBody');
+    if(products.length === 0){
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" class="no-products">
+            🚀 Add your first product using the form above!
+          </td>
+        </tr>`;
+      return;
+    }
+    tbody.innerHTML = products.map(p => `
+      <tr>
+        <td><img src="${p.image}" style="width:50px;height:50px;border-radius:10px;object-fit:cover;border:2px solid #f3d2f0;"></td>
+        <td><strong>${p.name}</strong><br><small style="color:#999;">ID: ${p.id}</small></td>
+        <td><span class="price-badge">₹${Number(p.price).toLocaleString('en-IN')}</span></td>
+        <td style="font-weight:600;color:#9b1b63;">${p.category}</td>
+        <td>${(p.description||'').substring(0,60)}${p.description && p.description.length>60?'...':''}</td>
+        <td><button class="btn btn-danger btn-small" onclick="deleteProduct(${p.id})">🗑️ Delete</button></td>
+      </tr>
+    `).join('');
+  }
+
+  function deleteProduct(id){
+    if(!confirm('Delete this product?')) return;
+    const products = loadProducts().filter(p => p.id !== id);
+    saveProducts(products);
+  }
+
+  function clearAllProducts(){
+    if(!confirm('Delete ALL products?')) return;
+    localStorage.removeItem(STORAGE_KEY);
+    renderProductsTable();
+    updateDashboard();
+  }
+
+  function updateDashboard(){
+    const products = loadProducts();
+    document.getElementById('totalProducts').textContent = products.length;
+    document.getElementById('totalRevenue').textContent =
+      '₹' + products.reduce((s,p)=>s+(p.price||0),0).toLocaleString('en-IN');
+    document.getElementById('totalCategories').textContent = customCategories.length;
+    document.getElementById('totalImages').textContent = uploadedImages.length;
+  }
+
+  function setupDragAndDrop(){
+    const uploadSection = document.querySelector('.image-upload-section');
+    uploadSection.addEventListener('dragover', e=>{
+      e.preventDefault();
+      uploadSection.classList.add('dragover');
+    });
+    uploadSection.addEventListener('dragleave', ()=>{
+      uploadSection.classList.remove('dragover');
+    });
+    uploadSection.addEventListener('drop', e=>{
+      e.preventDefault();
+      uploadSection.classList.remove('dragover');
+      const dt = new DataTransfer();
+      Array.from(e.dataTransfer.files).forEach(f=>dt.items.add(f));
+      const input = document.getElementById('imageUpload');
+      input.files = dt.files;
+      handleImageUpload({target: input});
+    });
+  }
+
+  function initAdminPanel(){
+    uploadedImages = loadImages();
+    customCategories = loadCategories();
+    renderImageGallery();
+    renderCategoriesList();
+    updateProductCategoryDropdown();
+    renderProductsTable();
+    updateDashboard();
+    setupDragAndDrop();
+  }
+
+  function refreshData(){
+    initAdminPanel();
+  }
+
+  document.addEventListener('DOMContentLoaded', ()=>{
+    const pwd = document.getElementById('adminPassword');
+    pwd.addEventListener('keypress', e=>{
+      if(e.key === 'Enter') checkPassword();
+    });
+    document.getElementById('addProductForm').addEventListener('submit', e=>{
+      e.preventDefault();
+      if(!selectedImageUrl){
+        alert('Select an image first');
+        return;
+      }
+      const category = document.getElementById('productCategory').value;
+      if(!category){
+        alert('Select a category first');
+        return;
+      }
+      const product = {
+        id: Date.now(),
+        name: document.getElementById('productName').value.trim(),
+        price: parseFloat(document.getElementById('productPrice').value),
+        category,
+        image: selectedImageUrl,
+        description: document.getElementById('productDescription').value.trim()
+      };
+      const products = loadProducts();
+      products.push(product);
+      saveProducts(products);
+      e.target.reset();
+      clearImageSelection();
+    });
+    document.getElementById('newCategoryInput').addEventListener('keypress', e=>{
+      if(e.key === 'Enter'){
+        e.preventDefault();
+        addCategory();
+      }
+    });
+  });
+</script>
+</body>
+</html>
