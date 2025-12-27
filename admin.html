@@ -18,6 +18,100 @@
     color:#333;
   }
 
+  /* PASSWORD MODAL */
+  .password-modal{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.7);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:10000;
+    backdrop-filter:blur(10px);
+  }
+  .password-modal.hidden{
+    display:none;
+  }
+  .password-container{
+    background:#fff;
+    border-radius:25px;
+    padding:3rem 2.5rem;
+    text-align:center;
+    box-shadow:0 30px 80px rgba(176,46,114,0.5);
+    border:3px solid #f3d2f0;
+    max-width:450px;
+    width:90%;
+    animation:modalSlideIn 0.4s ease-out;
+  }
+  @keyframes modalSlideIn{
+    from{transform:translateY(-50px) scale(0.9); opacity:0;}
+    to{transform:translateY(0) scale(1); opacity:1;}
+  }
+  .password-lock-icon{
+    font-size:5rem;
+    background:linear-gradient(135deg, #b02e72, #8b1a62);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    background-clip:text;
+    margin-bottom:1.5rem;
+    display:block;
+  }
+  .password-title{
+    font-size:clamp(1.5rem, 5vw, 2rem);
+    font-weight:800;
+    color:#9b1b63;
+    margin-bottom:1rem;
+  }
+  .password-subtitle{
+    color:#666;
+    margin-bottom:2rem;
+    font-size:1.1rem;
+  }
+  .password-input-group{
+    position:relative;
+    margin-bottom:2rem;
+  }
+  .password-input{
+    width:100%;
+    padding:1.5rem 1.5rem 1.5rem 3rem;
+    border:3px solid #f2c9e3;
+    border-radius:15px;
+    font-size:1.2rem;
+    font-weight:600;
+    background:#fff;
+    transition:all 0.3s ease;
+    font-family:inherit;
+  }
+  .password-input:focus{
+    outline:none;
+    border-color:#b02e72;
+    box-shadow:0 0 0 4px rgba(176,46,114,0.2);
+    transform:scale(1.02);
+  }
+  .password-icon{
+    position:absolute;
+    left:1.2rem;
+    top:50%;
+    transform:translateY(-50%);
+    font-size:1.4rem;
+    color:#b02e72;
+  }
+  .password-error{
+    color:#f44336;
+    font-size:0.9rem;
+    margin-top:0.5rem;
+    display:none;
+  }
+  .password-actions{
+    display:flex;
+    gap:1rem;
+    justify-content:center;
+    flex-wrap:wrap;
+  }
+
   .page-wrap{
     max-width:1400px;
     margin:0 auto;
@@ -390,40 +484,11 @@
   }
 
   /* RESPONSIVE */
-  @media(max-width:1024px){
-    .page-wrap{padding:1.25rem;}
-    .dashboard-grid{grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:1.25rem;}
-    .image-gallery{grid-template-columns:repeat(auto-fill, minmax(100px, 1fr));}
-  }
-  
   @media(max-width:768px){
+    .password-container{padding:2rem 1.5rem;}
+    .password-actions{flex-direction:column;}
     .page-wrap{padding:1rem;}
-    .admin-header{padding:1.5rem 1.25rem;}
-    .section{padding:1.75rem 1.5rem;}
-    .dashboard-grid{grid-template-columns:repeat(2, 1fr); gap:1rem;}
-    .product-form-grid{grid-template-columns:1fr; gap:1.25rem;}
-    .image-gallery{grid-template-columns:repeat(3, 1fr);}
     .category-input-group{flex-direction: column; align-items: stretch;}
-  }
-  
-  @media(max-width:480px){
-    .page-wrap{padding:0.75rem;}
-    .admin-header{padding:1.25rem 1rem;}
-    .admin-header .btn-container{flex-direction:column; width:100%;}
-    .admin-header .btn{flex:1;}
-    .section{padding:1.5rem 1.25rem;}
-    .dashboard-grid{grid-template-columns:1fr; gap:1rem;}
-    .products-table th, .products-table td{padding:1rem 0.75rem;}
-    .products-table{font-size:0.9rem;}
-    .section-header{flex-direction:column; align-items:stretch;}
-    .image-gallery{grid-template-columns:repeat(2, 1fr);}
-    .image-upload-section{padding:1.5rem;}
-  }
-  
-  @media(max-width:360px){
-    .products-table th, .products-table td{padding:0.75rem 0.5rem;}
-    .dash-card{padding:1.5rem 1rem;}
-    .image-gallery{grid-template-columns:1fr;}
   }
 
   /* TOUCH FRIENDLY */
@@ -435,7 +500,33 @@
 </style>
 </head>
 <body>
-<div class="page-wrap">
+
+<!-- 🔥 PASSWORD MODAL (PAGE LOAD PE HI AAYEGA) -->
+<div class="password-modal" id="passwordModal">
+  <div class="password-container">
+    <div class="password-lock-icon">🔐</div>
+    <h2 class="password-title">Admin Access Required</h2>
+    <p class="password-subtitle">Enter password to access Kartiki Resin Arts Admin Panel</p>
+    
+    <div class="password-input-group">
+      <span class="password-icon">🔑</span>
+      <input type="password" id="adminPassword" class="password-input" placeholder="Enter admin password" maxlength="20">
+      <div class="password-error" id="passwordError">❌ Incorrect password!</div>
+    </div>
+    
+    <div class="password-actions">
+      <button class="btn btn-primary" onclick="checkPassword()">
+        ✅ Unlock Admin
+      </button>
+      <button class="btn btn-secondary" onclick="window.location.href='index.html'">
+        🏠 Go to Website
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT (HIDDEN UNTIL PASSWORD) -->
+<div class="page-wrap" id="mainContent" style="display:none;">
 
   <!-- HEADER -->
   <header class="admin-header">
@@ -586,6 +677,41 @@
 </div>
 
 <script>
+  // 🔥 PASSWORD PROTECTION
+  const ADMIN_PASSWORD = "kartiki123"; // Change this password
+  
+  function checkPassword(){
+    const input = document.getElementById('adminPassword');
+    const error = document.getElementById('passwordError');
+    
+    if(input.value === ADMIN_PASSWORD){
+      // Success - Hide modal, show content
+      document.getElementById('passwordModal').classList.add('hidden');
+      document.getElementById('mainContent').style.display = 'block';
+      input.value = ''; // Clear password
+      
+      // Initialize admin panel
+      setTimeout(() => {
+        initAdminPanel();
+      }, 300);
+    } else {
+      // Wrong password
+      error.style.display = 'block';
+      input.style.borderColor = '#f44336';
+      input.style.boxShadow = '0 0 0 3px rgba(244,67,54,0.2)';
+      input.focus();
+      input.select();
+    }
+  }
+
+  // Enter key for password
+  document.getElementById('adminPassword').addEventListener('keypress', function(e){
+    if(e.key === 'Enter'){
+      checkPassword();
+    }
+  });
+
+  // ADMIN PANEL FUNCTIONS (REMAINING CODE SAME)
   const STORAGE_KEY = "kartiki_products";
   const IMAGES_KEY = "kartiki_images";
   const CATEGORIES_KEY = "kartiki_categories";
@@ -593,7 +719,17 @@
   let selectedImageUrl = '';
   let customCategories = [];
 
-  // Load data
+  function initAdminPanel(){
+    uploadedImages = loadImages();
+    customCategories = loadCategories();
+    updateDashboard();
+    renderProductsTable();
+    renderImageGallery();
+    renderCategoriesList();
+    updateProductCategoryDropdown();
+  }
+
+  // Load data functions...
   function loadProducts(){
     try{
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -634,7 +770,7 @@
     updateDashboard();
   }
 
-  // 🔥 CATEGORY MANAGEMENT
+  // Category functions...
   function addCategory(){
     const input = document.getElementById('newCategoryInput');
     const categoryName = input.value.trim();
@@ -661,7 +797,6 @@
     updateProductCategoryDropdown();
     input.value = '';
     
-    // Success feedback
     const btn = event.target;
     const originalText = btn.textContent;
     btn.textContent = '✅ Added!';
@@ -708,12 +843,10 @@
       {value: "pooja thali", label: "🛕 Pooja Thali"}
     ];
     
-    // Add default categories
     let options = defaultCategories.map(cat => 
       `<option value="${cat.value}">${cat.label}</option>`
     );
     
-    // Add custom categories
     options = options.concat(
       customCategories.map(cat => `<option value="${cat}">${cat}</option>`)
     );
@@ -721,13 +854,13 @@
     select.innerHTML = `<option value="">Select Category</option>` + options.join('');
   }
 
-  // 🔥 IMAGE UPLOAD & GALLERY
+  // Image upload functions (same as before)...
   function handleImageUpload(event){
     const files = Array.from(event.target.files);
     const newImages = [];
 
     files.forEach(file => {
-      if(file.type.startsWith('image/') && file.size < 5 * 1024 * 1024){ // 5MB limit
+      if(file.type.startsWith('image/') && file.size < 5 * 1024 * 1024){
         const reader = new FileReader();
         reader.onload = function(e){
           newImages.push({
@@ -747,7 +880,6 @@
     });
   }
 
-  // Drag & Drop
   const uploadSection = document.querySelector('.image-upload-section');
   uploadSection.addEventListener('dragover', (e) => {
     e.preventDefault();
@@ -792,13 +924,11 @@
     selectedImageUrl = url;
     document.getElementById('selectedImageName').textContent = name;
     
-    // Update preview
     const preview = document.getElementById('imagePreview');
     const previewImg = document.getElementById('previewImage');
     previewImg.src = url;
     preview.style.display = 'block';
     
-    // Update gallery selection
     document.querySelectorAll('.gallery-image').forEach(img => {
       img.classList.remove('selected');
       if(img.src === url) img.classList.add('selected');
@@ -812,18 +942,10 @@
     document.querySelectorAll('.gallery-image').forEach(img => img.classList.remove('selected'));
   }
 
-  // Save products
-  function saveProducts(products){
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
-    updateDashboard();
-    renderProductsTable();
-  }
-
-  // Add product (NO URL FIELD - ONLY GALLERY REQUIRED)
+  // Product form submit...
   document.getElementById('addProductForm').addEventListener('submit', function(e){
     e.preventDefault();
     
-    // Image selection MANDATORY
     if(!selectedImageUrl){
       alert('⚠️ Please select an image from gallery first!\n\n📸 Upload images → Select from gallery → Add product');
       return;
@@ -834,7 +956,7 @@
       name: document.getElementById('productName').value.trim(),
       price: parseFloat(document.getElementById('productPrice').value),
       category: document.getElementById('productCategory').value,
-      image: selectedImageUrl, // Only from gallery
+      image: selectedImageUrl,
       description: document.getElementById('productDescription').value.trim()
     };
 
@@ -842,7 +964,6 @@
     products.push(product);
     saveProducts(products);
 
-    // Reset form
     this.reset();
     clearImageSelection();
     const submitBtn = this.querySelector('.btn-primary');
@@ -855,7 +976,12 @@
     }, 2000);
   });
 
-  // Delete product
+  function saveProducts(products){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+    updateDashboard();
+    renderProductsTable();
+  }
+
   function deleteProduct(id){
     if(confirm('🗑️ Are you sure you want to delete this product?')){
       const products = loadProducts();
@@ -864,7 +990,6 @@
     }
   }
 
-  // Update dashboard
   function updateDashboard(){
     const products = loadProducts();
     const allCategories = [...new Set(products.map(p => p.category).filter(Boolean))];
@@ -875,7 +1000,6 @@
       '₹' + products.reduce((sum, p) => sum + (p.price || 0), 0).toLocaleString('en-IN');
   }
 
-  // Render products table
   function renderProductsTable(){
     const products = loadProducts();
     const tbody = document.getElementById('productsTableBody');
@@ -908,8 +1032,7 @@
         <td>${(product.description || 'No description').substring(0, 60)}${(product.description || '').length > 60 ? '...' : ''}</td>
         <td>
           <div class="action-buttons">
-            <button class="btn btn-danger btn-small" 
-                    onclick="deleteProduct(${product.id})">
+            <button class="btn btn-danger btn-small" onclick="deleteProduct(${product.id})">
               🗑️ Delete
             </button>
           </div>
@@ -918,7 +1041,6 @@
     `).join('');
   }
 
-  // Clear all products
   function clearAllProducts(){
     if(confirm('⚠️ Delete ALL products? This action cannot be undone!\n\nAll products will be permanently removed from your website.')){
       localStorage.removeItem(STORAGE_KEY);
@@ -927,7 +1049,6 @@
     }
   }
 
-  // Refresh data
   function refreshData(){
     uploadedImages = loadImages();
     customCategories = loadCategories();
@@ -938,17 +1059,8 @@
     updateProductCategoryDropdown();
   }
 
-  // Initialize
+  // Enter key for category
   document.addEventListener('DOMContentLoaded', function(){
-    uploadedImages = loadImages();
-    customCategories = loadCategories();
-    updateDashboard();
-    renderProductsTable();
-    renderImageGallery();
-    renderCategoriesList();
-    updateProductCategoryDropdown();
-    
-    // Enter key support for category input
     document.getElementById('newCategoryInput').addEventListener('keypress', function(e){
       if(e.key === 'Enter'){
         addCategory();
