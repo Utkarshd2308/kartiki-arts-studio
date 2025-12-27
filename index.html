@@ -550,7 +550,7 @@
     document.getElementById('modalProductCategory').textContent = product.category || "Resin Art";
     document.getElementById('modalProductDescription').textContent = product.description || "Premium handmade resin art product.";
     
-    const msg = `🌟 New Order from Kartiki Resin Arts!\n \n📦 Product: ${product.name} \n💰 Price:- ${typeof product.price === "number" ? "₹" + Number(product.price).toLocaleString("en-IN") : product.price}\n🎨 Category: ${product.category || "Resin Art"}\n\n\n✍️ Please confirm:\n• Quantity?\n• Customization?\n• Delivery address?`;
+    const msg = `🌟 New Order for Kartiki Resin Arts!\n \n📦 Product: ${product.name} \n💰 Price:- ${typeof product.price === "number" ? "₹" + Number(product.price).toLocaleString("en-IN") : product.price}\n🎨 Category: ${product.category || "Resin Art"}\n\n\n✍️ Please confirm:\n• Quantity?\n• Customization?\n• Delivery address?`;
     document.getElementById('modalOrderBtn').href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
     
     document.getElementById('productModal').style.display = 'flex';
@@ -629,4 +629,5 @@
   });
 </script>
 </body>
+
 </html>
