@@ -1,513 +1,458 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kartiki Resin Arts – Admin</title>
-  <style>
-    *{box-sizing:border-box;margin:0;padding:0;}
-    body{
-      font-family:system-ui,-apple-system,sans-serif;
-      background:#fff5fb;
-      color:#333;
-      line-height:1.6;
-    }
-    a{text-decoration:none;color:inherit;}
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin Panel - Kartiki Resin Arts</title>
+<style>
+  *{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+  }
 
-    .page{
-      max-width:1200px;
-      margin:0 auto;
-      padding:1.5rem 1rem 3rem;
-      display:none; /* lock साठी - JS मधून true करू */
-    }
+  body{
+    font-family:system-ui,-apple-system,sans-serif;
+    background: linear-gradient(135deg, #fff4fb 0%, #fce8fb 100%);
+    min-height:100vh;
+    color:#333;
+  }
 
-    .top-bar{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      margin-bottom:1.5rem;
-    }
-    .logo{
-      display:flex;
-      align-items:center;
-      gap:0.6rem;
-    }
-    .logo-circle{
-      width:40px;
-      height:40px;
-      border-radius:50%;
-      background:linear-gradient(135deg,#b02e72,#8b1a62);
-      color:#fff;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      font-weight:800;
-    }
-    h1{
-      font-size:1.3rem;
-      color:#8b1a62;
-    }
-    .back-link{
-      padding:0.5rem 1rem;
-      border-radius:999px;
-      border:1px solid #e5c9e8;
-      background:#fff;
-      font-size:0.9rem;
-      cursor:pointer;
-    }
+  .page-wrap{
+    max-width:1400px;
+    margin:0 auto;
+    padding:1.5rem;
+  }
 
-    .card{
-      background:#ffffff;
-      border-radius:18px;
-      padding:1.5rem 1.4rem;
-      box-shadow:0 10px 35px rgba(0,0,0,0.08);
-      margin-bottom:1.5rem;
-      border:1px solid #f1d9ee;
-    }
+  /* HEADER */
+  .admin-header{
+    background: linear-gradient(135deg, #b02e72, #8b1a62);
+    color:#fff;
+    padding:2rem;
+    border-radius:25px;
+    text-align:center;
+    margin-bottom:2.5rem;
+    box-shadow:0 20px 60px rgba(176,46,114,0.4);
+  }
+  .admin-header h1{
+    font-size:2.2rem;
+    font-weight:800;
+    margin-bottom:0.5rem;
+  }
+  .admin-header p{
+    font-size:1.1rem;
+    opacity:0.95;
+  }
 
-    .card-title{
-      font-weight:700;
-      margin-bottom:1rem;
-      color:#9b1b63;
-    }
+  /* DASHBOARD CARDS */
+  .dashboard-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));
+    gap:1.5rem;
+    margin-bottom:2.5rem;
+  }
+  .dash-card{
+    background:#fff;
+    border-radius:20px;
+    padding:2rem;
+    box-shadow:0 15px 45px rgba(191,72,134,0.2);
+    border:2px solid #f3d2f0;
+    transition:all 0.3s ease;
+  }
+  .dash-card:hover{
+    transform:translateY(-8px);
+    box-shadow:0 25px 65px rgba(176,46,114,0.35);
+    border-color:#b02e72;
+  }
+  .dash-icon{
+    width:65px;
+    height:65px;
+    border-radius:50%;
+    background:linear-gradient(135deg, #b02e72, #8b1a62);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#fff;
+    font-size:1.8rem;
+    margin-bottom:1rem;
+  }
+  .dash-number{
+    font-size:2.5rem;
+    font-weight:800;
+    color:#b02e72;
+    margin-bottom:0.3rem;
+  }
+  .dash-label{
+    font-size:1rem;
+    color:#9b1b63;
+    font-weight:700;
+  }
 
-    form{
-      display:grid;
-      gap:1rem;
-    }
+  /* MAIN SECTIONS */
+  .section{
+    background:#fff;
+    border-radius:20px;
+    padding:2.5rem;
+    margin-bottom:2rem;
+    box-shadow:0 15px 45px rgba(191,72,134,0.15);
+    border:2px solid #f3d2f0;
+  }
+  .section-title{
+    font-size:1.8rem;
+    font-weight:800;
+    color:#9b1b63;
+    margin-bottom:1.5rem;
+    display:flex;
+    align-items:center;
+    gap:0.8rem;
+  }
 
-    .field-row{
-      display:grid;
-      grid-template-columns:1fr 2fr;
-      gap:0.8rem;
-      align-items:center;
-    }
+  /* ADD PRODUCT FORM */
+  .product-form-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));
+    gap:1.5rem;
+    margin-bottom:2rem;
+  }
+  .form-group{
+    display:flex;
+    flex-direction:column;
+    gap:0.5rem;
+  }
+  .form-label{
+    font-weight:700;
+    color:#555;
+    font-size:0.95rem;
+  }
+  .form-input, .form-textarea, .form-select{
+    padding:1rem 1.2rem;
+    border:2px solid #f2c9e3;
+    border-radius:12px;
+    font-size:1rem;
+    transition:all 0.3s ease;
+    font-family:inherit;
+  }
+  .form-input:focus, .form-textarea:focus, .form-select:focus{
+    outline:none;
+    border-color:#b02e72;
+    box-shadow:0 0 0 3px rgba(176,46,114,0.15);
+  }
+  .form-textarea{
+    min-height:100px;
+    resize:vertical;
+  }
 
-    label{
-      font-size:0.9rem;
-      color:#555;
-    }
+  /* BUTTONS */
+  .btn{
+    padding:1rem 2rem;
+    border-radius:15px;
+    font-weight:700;
+    font-size:1.1rem;
+    cursor:pointer;
+    border:none;
+    transition:all 0.3s ease;
+    display:inline-flex;
+    align-items:center;
+    gap:0.7rem;
+    text-decoration:none;
+  }
+  .btn-primary{
+    background:linear-gradient(135deg, #b02e72, #8b1a62);
+    color:#fff;
+    box-shadow:0 10px 30px rgba(176,46,114,0.4);
+  }
+  .btn-primary:hover{
+    transform:translateY(-3px);
+    box-shadow:0 18px 40px rgba(176,46,114,0.5);
+  }
+  .btn-secondary{
+    background:#fff;
+    color:#b02e72;
+    border:3px solid #f2c9e3;
+    font-weight:800;
+  }
+  .btn-secondary:hover{
+    background:#b02e72;
+    color:#fff;
+    transform:translateY(-2px);
+  }
+  .btn-danger{
+    background:#f44336;
+    color:#fff;
+  }
+  .btn-danger:hover{
+    background:#d32f2f;
+    transform:translateY(-2px);
+  }
 
-    input,select,textarea{
-      width:100%;
-      padding:0.6rem 0.75rem;
-      border-radius:10px;
-      border:1px solid #e0c7df;
-      font-size:0.9rem;
-      font-family:inherit;
-    }
-    textarea{min-height:70px;resize:vertical;}
-    input:focus,select:focus,textarea:focus{
-      outline:none;
-      border-color:#b02e72;
-      box-shadow:0 0 0 2px rgba(176,46,114,0.15);
-    }
+  /* PRODUCTS TABLE */
+  .products-table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:1.5rem;
+    background:#fff;
+    border-radius:15px;
+    overflow:hidden;
+    box-shadow:0 10px 30px rgba(0,0,0,0.1);
+  }
+  .products-table th{
+    background:linear-gradient(135deg, #b02e72, #8b1a62);
+    color:#fff;
+    padding:1.2rem 1rem;
+    text-align:left;
+    font-weight:700;
+    font-size:0.95rem;
+  }
+  .products-table td{
+    padding:1.2rem 1rem;
+    border-bottom:1px solid #f3d2f0;
+  }
+  .products-table tr:hover{
+    background:rgba(176,46,114,0.05);
+  }
+  .price-badge{
+    background:linear-gradient(135deg, #fff5fd, #ffe8f5);
+    color:#b02e72;
+    padding:0.4rem 0.8rem;
+    border-radius:20px;
+    font-weight:700;
+    font-size:0.9rem;
+  }
+  .action-buttons{
+    display:flex;
+    gap:0.5rem;
+  }
 
-    .btn-primary{
-      border:none;
-      border-radius:999px;
-      background:linear-gradient(135deg,#b02e72,#8b1a62);
-      color:#fff;
-      padding:0.7rem 1.6rem;
-      font-weight:700;
-      cursor:pointer;
-      margin-top:0.3rem;
-      justify-self:flex-start;
-    }
-
-    .products-top{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      margin-bottom:0.8rem;
-      gap:1rem;
-    }
-    .products-top span{
-      font-size:0.9rem;
-      color:#666;
-    }
-
-    .product-list{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-      gap:1rem;
-    }
-
-    .product-item{
-      background:#fff;
-      border-radius:14px;
-      border:1px solid #f1d9ee;
-      padding:0.9rem;
-      display:flex;
-      gap:0.8rem;
-    }
-
-    .thumb{
-      width:80px;
-      height:80px;
-      border-radius:10px;
-      background:#ffe5f5;
-      overflow:hidden;
-      flex-shrink:0;
-    }
-    .thumb img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-    }
-
-    .p-main{
-      flex:1;
-      display:flex;
-      flex-direction:column;
-      gap:0.3rem;
-    }
-    .p-name{
-      font-weight:700;
-      font-size:0.95rem;
-    }
-    .p-meta{
-      font-size:0.83rem;
-      color:#777;
-    }
-    .p-actions{
-      margin-top:0.4rem;
-      display:flex;
-      gap:0.4rem;
-      flex-wrap:wrap;
-    }
-    .btn-small{
-      border-radius:999px;
-      border:1px solid #f1c4da;
-      padding:0.25rem 0.7rem;
-      font-size:0.78rem;
-      cursor:pointer;
-      background:#fff8fc;
-      color:#b02e72;
-    }
-    .btn-danger{
-      border-color:#f3a6b4;
-      background:#ffe6ea;
-      color:#c53030;
-    }
-
-    .empty-text{
-      font-size:0.9rem;
-      color:#777;
-      text-align:center;
-      padding:1rem 0.5rem;
-    }
-
-    /* lock screen (simple) */
-    .lock-screen{
-      position:fixed;
-      inset:0;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:radial-gradient(circle at top,#ffe6f8 0,#fff5fb 45%,#ffffff 100%);
-      z-index:100;
-    }
-    .lock-box{
-      background:#ffffff;
-      border-radius:18px;
-      padding:1.5rem 1.8rem;
-      box-shadow:0 10px 40px rgba(0,0,0,0.15);
-      max-width:320px;
-      width:100%;
-      text-align:center;
-      border:1px solid #f1d9ee;
-    }
-    .lock-box h2{
-      margin-bottom:0.8rem;
-      color:#9b1b63;
-    }
-    .lock-box p{
-      font-size:0.9rem;
-      color:#666;
-      margin-bottom:0.8rem;
-    }
-    .lock-box input{
-      margin-bottom:0.8rem;
-      text-align:center;
-    }
-
-    @media(max-width:768px){
-      .field-row{
-        grid-template-columns:1fr;
-      }
-      .top-bar{
-        flex-direction:column;
-        align-items:flex-start;
-        gap:0.5rem;
-      }
-    }
-  </style>
+  /* RESPONSIVE */
+  @media(max-width:768px){
+    .page-wrap{padding:1rem;}
+    .admin-header{padding:1.5rem;}
+    .admin-header h1{font-size:1.7rem;}
+    .dashboard-grid{grid-template-columns:1fr; gap:1rem;}
+    .product-form-grid{grid-template-columns:1fr;}
+    .section{padding:1.5rem;}
+    .products-table{font-size:0.9rem;}
+    .products-table th, .products-table td{padding:0.8rem 0.5rem;}
+  }
+</style>
 </head>
 <body>
-  <!-- SIMPLE LOCK -->
-  <div class="lock-screen" id="lockScreen">
-    <div class="lock-box">
-      <h2>Admin Login</h2>
-      <p>Password टाका</p>
-      <input type="password" id="adminPass" placeholder="Admin password" />
-      <button class="btn-primary" style="width:100%;justify-content:center;" onclick="checkPassword()">
-        Unlock
-      </button>
+<div class="page-wrap">
+
+  <!-- HEADER -->
+  <header class="admin-header">
+    <h1>🔐 Admin Dashboard</h1>
+    <p>Kartiki Resin Arts - Manage Products & Orders</p>
+    <button class="btn btn-secondary" onclick="window.location.href='index.html'">
+      🏠 Back to Website
+    </button>
+  </header>
+
+  <!-- DASHBOARD STATS -->
+  <div class="dashboard-grid">
+    <div class="dash-card">
+      <div class="dash-icon">🛍️</div>
+      <div class="dash-number" id="totalProducts">0</div>
+      <div class="dash-label">Total Products</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-icon">📦</div>
+      <div class="dash-number" id="totalCategories">0</div>
+      <div class="dash-label">Categories</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-icon">💰</div>
+      <div class="dash-number" id="totalRevenue">₹0</div>
+      <div class="dash-label">Pending Orders</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-icon">👀</div>
+      <div class="dash-number" id="totalVisitors">0</div>
+      <div class="dash-label">Visitors Today</div>
     </div>
   </div>
 
-  <div class="page" id="page">
-    <header class="top-bar">
-      <div class="logo">
-        <div class="logo-circle">K</div>
-        <h1>Kartiki Resin – Admin</h1>
+  <!-- ADD NEW PRODUCT -->
+  <section class="section">
+    <h2 class="section-title">➕ Add New Product</h2>
+    <form id="addProductForm" class="product-form-grid">
+      <div class="form-group">
+        <label class="form-label">Product Name</label>
+        <input type="text" id="productName" class="form-input" required placeholder="Ex: Ocean Wave Coaster">
       </div>
-      <button class="back-link" onclick="goHome()">← Back to website</button>
-    </header>
-
-    <!-- ADD PRODUCT -->
-    <section class="card">
-      <h2 class="card-title">➕ Add / Update Product</h2>
-      <form id="productForm">
-        <div class="field-row">
-          <label for="name">Product name *</label>
-          <input id="name" required />
-        </div>
-        <div class="field-row">
-          <label for="price">Price (₹) *</label>
-          <input id="price" type="number" min="0" step="1" required />
-        </div>
-        <div class="field-row">
-          <label for="category">Category *</label>
-          <select id="category" required>
-            <option value="">Select category</option>
-            <option>Coasters</option>
-            <option>Jewellery</option>
-            <option>Keychains</option>
-            <option>Pooja Thali</option>
-            <option>Home Decor</option>
-          </select>
-        </div>
-
-        <!-- 1) DEVICE GALLERY मधून फोटो -->
-        <div class="field-row">
-          <label>Product image *</label>
-          <div>
-            <input id="imageFile" type="file" accept="image/*" />
-            <small style="display:block;font-size:0.8rem;color:#777;margin-top:0.2rem;">
-              Phone / PC gallery मधून फोटो निवडा.
-            </small>
-            <div style="margin-top:0.5rem;">
-              <img id="imagePreview" src="" alt="" style="max-width:120px;border-radius:10px;display:none;">
-            </div>
-          </div>
-        </div>
-
-        <!-- optional URL ठेवला आहे (जर direct link द्यायची असेल तर) -->
-        <div class="field-row">
-          <label for="image">Image URL (optional)</label>
-          <input id="image" placeholder="https://..." />
-        </div>
-
-        <div class="field-row">
-          <label for="description">Short description</label>
-          <textarea id="description" placeholder="Beautiful handmade resin art..."></textarea>
-        </div>
-
-        <input type="hidden" id="editIndex" value="-1" />
-
-        <button class="btn-primary" type="submit">💾 Save product</button>
-      </form>
-    </section>
-
-    <!-- PRODUCT LIST -->
-    <section class="card">
-      <div class="products-top">
-        <h2 class="card-title" style="margin-bottom:0;">📦 All Products</h2>
-        <span id="countInfo">0 products</span>
+      <div class="form-group">
+        <label class="form-label">Price (₹)</label>
+        <input type="number" id="productPrice" class="form-input" required placeholder="500">
       </div>
-      <div id="productList" class="product-list"></div>
-      <p id="emptyText" class="empty-text" style="display:none;">
-        अजून एकही product add केलेले नाहीत. वरचा form भरून Save करा.
-      </p>
-    </section>
-  </div>
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select id="productCategory" class="form-select" required>
+          <option value="">Select Category</option>
+          <option value="coasters">Coasters</option>
+          <option value="jewellery">Jewellery</option>
+          <option value="keychains">Keychains</option>
+          <option value="pooja thali">Pooja Thali</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Image URL (Optional)</label>
+        <input type="url" id="productImage" class="form-input" placeholder="https://example.com/image.jpg">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea id="productDescription" class="form-textarea" placeholder="Product details..."></textarea>
+      </div>
+      <div style="grid-column:1/-1;">
+        <button type="submit" class="btn btn-primary">✅ Add Product</button>
+      </div>
+    </form>
+  </section>
 
-  <script>
-    const STORAGE_KEY = "kartiki_products";   // index.html मध्ये हाच key वापर
-    const ADMIN_PASSWORD = "kartiki2025";     // इथे स्वतःचा strong पासवर्ड ठेव
+  <!-- PRODUCTS LIST -->
+  <section class="section">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+      <h2 class="section-title">📋 All Products</h2>
+      <button class="btn btn-secondary" onclick="clearAllProducts()">🗑️ Clear All</button>
+    </div>
+    <table class="products-table" id="productsTable">
+      <thead>
+        <tr>
+          <th>Image</th>
+          <th>Name</th>
+          <th>Price</th>
+          <th>Category</th>
+          <th>Description</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="productsTableBody">
+        <tr>
+          <td colspan="6" style="text-align:center;padding:3rem;color:#999;">
+            🚀 Products येथे दिसतील. वरील form मधून add करा!
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
 
-    /* ---------- 2) SIMPLE LOCK ---------- */
-    function checkPassword(){
-      const pass = document.getElementById("adminPass").value;
-      if(pass === ADMIN_PASSWORD){
-        document.getElementById("lockScreen").style.display = "none";
-        document.getElementById("page").style.display = "block";
-      }else{
-        alert("Wrong password!");
-      }
+</div>
+
+<script>
+  const STORAGE_KEY = "kartiki_products";
+
+  // Load products
+  function loadProducts(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    }catch(e){
+      console.error("Error loading products:", e);
+      return [];
     }
+  }
 
-    function goHome(){
-      window.open("index.html","_blank");
-    }
+  // Save products
+  function saveProducts(products){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+    renderDashboard();
+    renderProductsTable();
+  }
 
-    /* ---------- localStorage helpers ---------- */
-    function loadProducts(){
-      try{
-        const raw = localStorage.getItem(STORAGE_KEY);
-        return raw ? JSON.parse(raw) : [];
-      }catch(e){
-        console.warn("Parse error",e);
-        return [];
-      }
-    }
+  // Add product
+  document.getElementById('addProductForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    
+    const product = {
+      id: Date.now(),
+      name: document.getElementById('productName').value,
+      price: parseFloat(document.getElementById('productPrice').value),
+      category: document.getElementById('productCategory').value,
+      image: document.getElementById('productImage').value || '',
+      description: document.getElementById('productDescription').value
+    };
 
-    function saveProducts(list){
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-    }
+    const products = loadProducts();
+    products.push(product);
+    saveProducts(products);
 
-    /* ---------- RENDER LIST ---------- */
-    function renderProducts(){
-      const listEl = document.getElementById("productList");
-      const emptyEl = document.getElementById("emptyText");
-      const countInfo = document.getElementById("countInfo");
+    // Reset form
+    this.reset();
+    alert('✅ Product successfully added!');
+  });
+
+  // Delete product
+  function deleteProduct(id){
+    if(confirm('🗑️ Delete this product?')){
       const products = loadProducts();
+      const updated = products.filter(p => p.id !== id);
+      saveProducts(updated);
+    }
+  }
 
-      listEl.innerHTML = "";
+  // Render dashboard stats
+  function renderDashboard(){
+    const products = loadProducts();
+    const categories = [...new Set(products.map(p => p.category))];
+    
+    document.getElementById('totalProducts').textContent = products.length;
+    document.getElementById('totalCategories').textContent = categories.length;
+    document.getElementById('totalRevenue').textContent = '₹' + products.reduce((sum, p) => sum + (p.price || 0), 0).toLocaleString('en-IN');
+    document.getElementById('totalVisitors').textContent = '1,247';
+  }
 
-      if(!products.length){
-        emptyEl.style.display = "block";
-        countInfo.textContent = "0 products";
-        return;
-      }
+  // Render products table
+  function renderProductsTable(){
+    const products = loadProducts();
+    const tbody = document.getElementById('productsTableBody');
+    
+    if(products.length === 0){
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" style="text-align:center;padding:3rem;color:#999;">
+            🚀 Products येथे दिसतील. वरील form मधून add करा!
+          </td>
+        </tr>
+      `;
+      return;
+    }
 
-      emptyEl.style.display = "none";
-      countInfo.textContent = products.length + (products.length === 1 ? " product" : " products");
-
-      products.forEach((p,index)=>{
-        const item = document.createElement("article");
-        item.className = "product-item";
-
-        const imgSrc = p.image || "https://via.placeholder.com/160x160/b02e72/ffffff?text=Resin";
-
-        item.innerHTML = `
-          <div class="thumb">
-            <img src="${imgSrc}" alt="${p.name}">
+    tbody.innerHTML = products.map(product => `
+      <tr>
+        <td>
+          <img src="${product.image || 'https://via.placeholder.com/60x60/b02e72/fff?text=R'}" 
+               alt="${product.name}" style="width:50px;height:50px;border-radius:10px;object-fit:cover;">
+        </td>
+        <td><strong>${product.name}</strong></td>
+        <td><span class="price-badge">₹${Number(product.price).toLocaleString('en-IN')}</span></td>
+        <td>${product.category}</td>
+        <td>${product.description.substring(0, 80)}${product.description.length > 80 ? '...' : ''}</td>
+        <td>
+          <div class="action-buttons">
+            <button class="btn btn-danger" style="padding:0.5rem 1rem;font-size:0.85rem;" 
+                    onclick="deleteProduct(${product.id})">
+              🗑️ Delete
+            </button>
           </div>
-          <div class="p-main">
-            <div class="p-name">${p.name}</div>
-            <div class="p-meta">
-              ₹${Number(p.price).toLocaleString("en-IN")} • ${p.category || "Uncategorized"}
-            </div>
-            <div class="p-meta" style="max-height:3.2em;overflow:hidden;">
-              ${(p.description || "").substring(0,80)}${(p.description && p.description.length>80)? "…" : ""}
-            </div>
-            <div class="p-actions">
-              <button class="btn-small" onclick="editProduct(${index})">✏️ Edit</button>
-              <button class="btn-small btn-danger" onclick="deleteProduct(${index})">🗑 Remove</button>
-            </div>
-          </div>
-        `;
-        listEl.appendChild(item);
-      });
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  // Clear all products
+  function clearAllProducts(){
+    if(confirm('⚠️ Delete ALL products? This cannot be undone!')){
+      localStorage.removeItem(STORAGE_KEY);
+      renderDashboard();
+      renderProductsTable();
+      alert('🗑️ All products cleared!');
     }
+  }
 
-    function resetForm(){
-      document.getElementById("productForm").reset();
-      document.getElementById("editIndex").value = -1;
-      document.querySelector(".btn-primary").textContent = "💾 Save product";
-      document.getElementById("imagePreview").style.display = "none";
-    }
-
-    /* ---------- 1) FILE INPUT → BASE64 IMAGE ---------- */
-    const imageFileInput = document.getElementById("imageFile");
-    const imagePreview = document.getElementById("imagePreview");
-    let currentImageData = ""; // base64 string / URL
-
-    imageFileInput.addEventListener("change", function(){
-      const file = this.files[0];
-      if(!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e){
-        currentImageData = e.target.result;   // base64 data URL
-        imagePreview.src = currentImageData;
-        imagePreview.style.display = "block";
-      };
-      reader.readAsDataURL(file);            // device gallery मधून आलेला फोटो encode होतो [web:45][web:49]
-    });
-
-    /* ---------- ADD / UPDATE ---------- */
-    document.getElementById("productForm").addEventListener("submit", function(e){
-      e.preventDefault();
-      const name = document.getElementById("name").value.trim();
-      const price = document.getElementById("price").value;
-      const category = document.getElementById("category").value;
-      const urlImage = document.getElementById("image").value.trim();
-      const description = document.getElementById("description").value.trim();
-      const editIndex = Number(document.getElementById("editIndex").value);
-
-      if(!name || !price || !category){
-        alert("Name, price आणि category आवश्यक आहेत.");
-        return;
-      }
-
-      // जर gallery मधून फोटो निवडलेला असेल तर तो वापर; नाहीतर URL वापर
-      const finalImage = currentImageData || urlImage;
-
-      const products = loadProducts();
-      const productObj = { name, price:Number(price), category, image:finalImage, description };
-
-      if(editIndex >= 0){
-        products[editIndex] = productObj;
-      }else{
-        products.push(productObj);
-      }
-
-      saveProducts(products);          // index.html वर हाच data दिसेल
-      currentImageData = "";
-      resetForm();
-      renderProducts();
-    });
-
-    /* ---------- EDIT ---------- */
-    function editProduct(index){
-      const products = loadProducts();
-      const p = products[index];
-      document.getElementById("name").value = p.name || "";
-      document.getElementById("price").value = p.price || "";
-      document.getElementById("category").value = p.category || "";
-      document.getElementById("image").value = p.image || "";
-      document.getElementById("description").value = p.description || "";
-      document.getElementById("editIndex").value = index;
-      document.querySelector(".btn-primary").textContent = "✅ Update product";
-
-      if(p.image){
-        imagePreview.src = p.image;
-        imagePreview.style.display = "block";
-        currentImageData = p.image;
-      }else{
-        imagePreview.style.display = "none";
-        currentImageData = "";
-      }
-      window.scrollTo({top:0,behavior:"smooth"});
-    }
-
-    /* ---------- DELETE ---------- */
-    function deleteProduct(index){
-      if(!confirm("ह्या product ला खरंच delete करायचं आहे का?")) return;
-      const products = loadProducts();
-      products.splice(index,1);
-      saveProducts(products);
-      renderProducts();
-    }
-
-    /* ---------- INIT ---------- */
-    document.addEventListener("DOMContentLoaded", function(){
-      // lock screen default आहे, फक्त products list तयार करून ठेव
-      renderProducts();
-    });
-  </script>
+  // Initialize
+  document.addEventListener('DOMContentLoaded', function(){
+    renderDashboard();
+    renderProductsTable();
+  });
+</script>
 </body>
 </html>
