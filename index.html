@@ -452,182 +452,150 @@
 
 </div>
 
-<script>
-  const WHATSAPP_NUMBER = "919579590991";
-  const STORAGE_KEY = "kartiki_products";
+ <script>
+        let products = JSON.parse(localStorage.getItem('mlaProducts') || '[]');
+        let categories = JSON.parse(localStorage.getItem('mlaCategories') || JSON.stringify(['All Products']));
+        let currentProduct = null;
 
-  function openAdmin(){window.open("admin.html","_blank");}
-  function scrollToSection(id){const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:"smooth",block:"start"});}
-  
-  function openSocial(platform){
-    const links={instagram:"https://www.instagram.com/kartiki_art_studio?igsh=MWJoNXliczVzMHEzaA==",facebook:"https://www.facebook.com/share/1Di49UfwVG/",youtube:"https://www.youtube.com/@kartikiswami"};
-    if(links[platform])window.open(links[platform],"_blank");
-  }
+        function loadCategories() {
+            const select = document.getElementById('categorySelect');
+            select.innerHTML = '<option value="all">All Categories</option>';
+            categories.filter(cat => cat !== 'All Products').forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat;
+                option.textContent = cat;
+                select.appendChild(option);
+            });
+        }
 
-  function loadProducts(){
-    try{
-      const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : [];
-    } catch(e){
-      console.error('Error loading products:', e);
-      return [];
-    }
-  }
+        function displayProducts(prods = products) {
+            const display = document.getElementById('productDisplay');
+            if (prods.length === 0) {
+                display.innerHTML = `
+                    <div class="no-products">
+                    <i class="fas fa-box-open"></i>
+                    <p>सध्या कोणतेही प्रॉडक्ट्स उपलब्ध नाहीत. कृपया <a href="admin.html" style="color: var(--primary-purple); font-weight: 600;">ॲडमिन पॅनेल</a> मधून जोडा.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            display.innerHTML = prods.map(product => `
+                <div class="product-card" onclick="openProductModal('${product.id}')">
+                    <div style="height: 200px; background: linear-gradient(135deg, ${product.category === 'Clocks' ? '#667eea' : '#ff6b7a'}20, #f0f0f0); border-radius: 15px; margin: -20px -20px 20px -20px; display: flex; align-items: center; justify-content: center; font-size: 48px; color: #ccc;"></div>
+                    <h3 style="font-size: 18px; margin-bottom: 10px; color: #333;">${product.name}</h3>
+                    <div style="font-size: 22px; font-weight: bold; color: var(--primary-purple); margin-bottom: 10px;">
+                        ₹${parseFloat(product.price || 0).toLocaleString('en-IN')}
+                    </div>
+                    <span style="background: var(--gradient); color: white; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">${product.category || 'Uncategorized'}</span>
+                    <p style="margin-top: 12px; color: #666; font-size: 14px; line-height: 1.5;">${product.desc?.substring(0, 100) || ''}${product.desc && product.desc.length > 100 ? '...' : ''}</p>
+                </div>
+            `).join('');
+        }
 
-  /* ✅ SUPER SEARCH - ALL ADMIN PRODUCTS */
-  function handleSearch(){
-    const term = document.getElementById("searchInput").value.trim().toLowerCase();
-    const catVal = document.getElementById("categorySelect").value;
-    const allProducts = loadProducts();
-    
-    console.log('🔍 Searching', allProducts.length, 'admin products for:', term);
-    
-    const activeCategory = document.querySelector('#categoryGrid .category-card.active');
-    let filtered = [];
-    
-    if(activeCategory) {
-      const categoryName = activeCategory.dataset.category.toLowerCase();
-      filtered = allProducts.filter(p => {
-        const name = (p.name || '').toLowerCase();
-        const cat = (p.category || '').toLowerCase();
-        const desc = (p.description || '').toLowerCase();
-        return cat.includes(categoryName) && 
-               (name.includes(term) || cat.includes(term) || desc.includes(term));
-      });
-    } else if(catVal) {
-      filtered = allProducts.filter(p => {
-        const name = (p.name || '').toLowerCase();
-        const cat = (p.category || '').toLowerCase();
-        const desc = (p.description || '').toLowerCase();
-        return cat === catVal.toLowerCase() && 
-               (name.includes(term) || cat.includes(term) || desc.includes(term));
-      });
-    } else if(term) {
-      filtered = allProducts.filter(p => {
-        const name = (p.name || '').toLowerCase();
-        const cat = (p.category || '').toLowerCase();
-        const desc = (p.description || '').toLowerCase();
-        return name.includes(term) || cat.includes(term) || desc.includes(term);
-      });
-    } else {
-      filtered = allProducts;
-    }
-    
-    console.log('✅ Found', filtered.length, 'results');
-    renderHomeProducts(filtered);
-    scrollToSection("products");
-    
-    // Search glow effect
-    const searchBox = document.getElementById('searchBox');
-    if(term) {
-      searchBox.classList.add('search-active');
-      setTimeout(() => searchBox.classList.remove('search-active'), 1000);
-    }
-  }
+        function openProductModal(productId) {
+            currentProduct = products.find(p => p.id === productId);
+            if (!currentProduct) return;
+            
+            document.getElementById('modalProductName').textContent = currentProduct.name;
+            document.getElementById('modalProductPrice').innerHTML = `₹${parseFloat(currentProduct.price || 0).toLocaleString('en-IN')}`;
+            document.getElementById('modalProductCategory').textContent = currentProduct.category || 'Uncategorized';
+            document.getElementById('modalProductDesc').textContent = currentProduct.desc || 'No description available.';
+            
+            const imagesContainer = document.getElementById('modalProductImages');
+            imagesContainer.innerHTML = '';
+            if (currentProduct.images && currentProduct.images.length > 0) {
+                currentProduct.images.slice(0, 6).forEach(img => {
+                    const imgEl = document.createElement('img');
+                    imgEl.src = img;
+                    imgEl.alt = currentProduct.name;
+                    imgEl.onerror = () => imgEl.style.display = 'none';
+                    imagesContainer.appendChild(imgEl);
+                });
+            } else {
+                imagesContainer.innerHTML = '<div style="width: 100px; height: 100px; background: #f0f0f0; border-radius: 15px; display: flex; align-items: center; justify-content: center; color: #ccc; font-size: 24px;">📷</div>';
+            }
+            
+            document.getElementById('productModal').style.display = 'block';
+        }
 
-  function filterByCategory(categoryName) {
-    document.querySelectorAll('#categoryGrid .category-card').forEach(card => {
-      card.classList.remove('active');
-    });
-    event.currentTarget.classList.add('active');
-    
-    const allProducts = loadProducts();
-    const filtered = allProducts.filter(p => 
-      (p.category || '').toLowerCase().includes(categoryName.toLowerCase())
-    );
-    
-    renderHomeProducts(filtered);
-    scrollToSection('products');
-    
-    document.getElementById('searchInput').value = '';
-    document.getElementById('categorySelect').value = '';
-  }
+        function closeProductModal() {
+            document.getElementById('productModal').style.display = 'none';
+        }
 
-  function showProductDetails(product){
-    document.getElementById('modalProductImage').src = product.image || "https://via.placeholder.com/400x300/b02e72/ffffff?text=Resin+Art";
-    document.getElementById('modalProductName').textContent = product.name || "Product Name";
-    document.getElementById('modalProductPrice').textContent = typeof product.price === "number" ? "₹" + Number(product.price).toLocaleString("en-IN") : product.price || "₹0";
-    document.getElementById('modalProductCategory').textContent = product.category || "Resin Art";
-    document.getElementById('modalProductDescription').textContent = product.description || "Premium handmade resin art product.";
-    
-    const msg = `🌟 New Order for Kartiki Resin Arts!\n \n📦 Product: ${product.name} \n💰 Price:- ${typeof product.price === "number" ? "₹" + Number(product.price).toLocaleString("en-IN") : product.price}\n🎨 Category: ${product.category || "Resin Art"}\n\n\n✍️ Please confirm:\n• Quantity?\n• Customization?\n• Delivery address?`;
-    document.getElementById('modalOrderBtn').href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
-    
-    document.getElementById('productModal').style.display = 'flex';
-  }
+        function orderOnWhatsApp() {
+            if (!currentProduct) return;
+            
+            const phone = "918087724038"; 
+            const message = `Hello!
 
-  function closeProductModal(){
-    document.getElementById('productModal').style.display = 'none';
-  }
+I am interested in "${currentProduct.name}"
 
-  function createProductCard(p){
-    const priceText = typeof p.price === "number" ? "₹" + Number(p.price).toLocaleString("en-IN") : p.price;
-    const imgSrc = p.image || "https://via.placeholder.com/300x300/b02e72/ffffff?text=Resin";
-    
-    const card = document.createElement("article");
-    card.className = "category-card";
-    card.onclick = () => showProductDetails(p);
-    
-    card.innerHTML = `
-      <div class="cat-icon-circle">
-        <img src="${imgSrc}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
-      </div>
-      <div class="cat-title">${p.name}</div>
-      <div class="cat-sub"><strong>${priceText}</strong> • ${p.category || "Resin Art"}</div>
-    `;
-    return card;
-  }
+Price: ₹${parseFloat(currentProduct.price || 0).toLocaleString('en-IN')}
+Category: ${currentProduct.category || 'Uncategorized'}
+Description: ${currentProduct.desc || 'No description'}
 
-  function renderHomeProducts(filteredList){
-    const grid = document.getElementById("productGrid");
-    const noText = document.getElementById("noProductsText");
-    
-    if(!grid) return;
-    
-    const products = filteredList || loadProducts();
-    grid.innerHTML = "";
-    
-    if(!products.length){
-      noText.style.display = "block";
-      const searchTerm = document.getElementById("searchInput").value.trim();
-      if(searchTerm) {
-        noText.textContent = `No products found for "${searchTerm}". Try different keywords or add from Admin.`;
-      } else {
-        noText.textContent = `अजून products add केलेले नाहीत. Admin panel मधून add करा.`;
-      }
-      return;
-    }
-    
-    noText.style.display = "none";
-    products.forEach(p => grid.appendChild(createProductCard(p)));
-  }
+Please confirm following Details :-
 
-  document.addEventListener("DOMContentLoaded", () => {
-    console.log('🚀 Kartiki Resin Arts - All Admin Products Ready!');
-    
-    renderHomeProducts();
-    
-    document.getElementById("searchBtn").addEventListener("click", handleSearch);
-    document.getElementById("searchInput").addEventListener("keydown", e => {
-      if(e.key === "Enter") {
-        e.preventDefault();
-        handleSearch();
-      }
-    });
-    
-    document.getElementById("categorySelect").addEventListener("change", handleSearch);
-    
-    document.getElementById('productModal').onclick = function(e){
-      if(e.target === this) closeProductModal();
-    };
-    
-    document.addEventListener('keydown', function(e){
-      if(e.key === 'Escape') closeProductModal();
-    });
-    
-    console.log('✅ Search + Categories + Modal - 100% Ready!');
-  });
-</script>
+Product Quantity :-
+Customization :-
+Delivery Address :-
+
+Thank you!`;
+            
+            const whatsappURL = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+            window.open(whatsappURL, '_blank');
+        }
+
+        function filterByCategory() {
+            const category = document.getElementById('categorySelect').value;
+            const filtered = category === 'all' ? products : products.filter(p => p.category === category);
+            displayProducts(filtered);
+        }
+
+        function setActivePill(activePill) {
+            document.querySelectorAll('.pill').forEach(pill => pill.classList.remove('active'));
+            activePill.classList.add('active');
+        }
+
+        function quickSearchProducts() {
+            const query = document.getElementById('quickSearch').value.toLowerCase();
+            const filtered = products.filter(p => 
+                p.name.toLowerCase().includes(query) || 
+                p.desc?.toLowerCase().includes(query) ||
+                p.category?.toLowerCase().includes(query)
+            );
+            displayProducts(filtered);
+        }
+
+        // Modal close on outside click
+        window.onclick = function(event) {
+            const modal = document.getElementById('productModal');
+            if (event.target === modal) {
+                closeProductModal();
+            }
+        }
+
+        // Auto-sync with admin panel
+        setInterval(() => {
+            const newProducts = JSON.parse(localStorage.getItem('mlaProducts') || '[]');
+            const newCategories = JSON.parse(localStorage.getItem('mlaCategories') || JSON.stringify(['All Products']));
+            if (JSON.stringify(newProducts) !== JSON.stringify(products) || 
+                JSON.stringify(newCategories) !== JSON.stringify(categories)) {
+                products = newProducts;
+                categories = newCategories;
+                loadCategories();
+                displayProducts();
+            }
+        }, 2000);
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCategories();
+            displayProducts();
+        });
+    </script>
 </body>
 
 </html>
+
