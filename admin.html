@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kartiki Resin Arts - Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); 
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .password-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(102,126,234,0.95); display: flex; align-items: center; 
+            justify-content: center; z-index: 10000; backdrop-filter: blur(10px);
+        }
+        .password-modal.hidden { display: none; }
+        .password-container { 
+            background: white; border-radius: 25px; padding: 3rem 2.5rem; 
+            text-align: center; box-shadow: 0 30px 80px rgba(102,126,234,0.5); 
+            border: 3px solid #667eea; max-width: 450px; width: 90%; 
+            animation: modalSlideIn 0.4s ease-out; 
+        }
+        @keyframes modalSlideIn { 
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .password-title {
+            font-size: 2rem; font-weight: 800; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+        }
+        .password-input {
+            width: 100%; padding: 1.2rem; border: 2px solid #e9ecef;
+            border-radius: 15px; font-size: 1.1rem; text-align: center;
+            margin-bottom: 1.5rem; transition: all 0.3s;
+        }
+        .password-buttons { display: flex; gap: 1rem; justify-content: center; }
+        .password-btn {
+            padding: 1rem 2rem; border: none; border-radius: 15px;
+            font-size: 1rem; font-weight: 600; cursor: pointer;
+            transition: all 0.3s; min-width: 120px;
+        }
+        .password-btn.primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .password-btn.secondary { background: transparent; color: #667eea; border: 2px solid #667eea; }
+        
+        .main-content { display: none; }
+        .main-content.show { display: block; }
+        
+        .navbar { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            padding: 1.5rem; border-radius: 20px; 
+            margin-bottom: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        .logo { font-size: 2rem; font-weight: 800; color: white; text-decoration: none; }
+        .home-link { color: white; text-decoration: none; display: block; margin-top: 10px; opacity: 0.9; }
+
+        .admin-container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+        .admin-card { background: white; border-radius: 25px; padding: 2rem; box-shadow: 0 15px 40px rgba(0,0,0,0.1); }
+        .card-title { font-size: 1.6rem; margin-bottom: 1.5rem; font-weight: 800; color: #444; }
+
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group input, .form-group select, .form-group textarea { 
+            width: 100%; padding: 0.8rem; border: 2px solid #e9ecef; border-radius: 12px; 
+        }
+
+        .btn { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; border: none; padding: 0.8rem; border-radius: 12px; 
+            font-weight: 600; cursor: pointer; width: 100%;
+        }
+        .btn-danger { background: #ff4757; }
+        .btn-success { background: #2ecc71; }
+        .btn-small { width: auto; padding: 0.4rem 0.8rem; }
+
+        .list-container { max-height: 350px; overflow-y: auto; background: #f8f9fa; border-radius: 15px; padding: 10px; margin-top: 10px; }
+        .list-item { 
+            background: white; padding: 10px; border-radius: 10px; margin-bottom: 8px;
+            display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .stats { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
+        .stat-card { flex: 1; background: white; padding: 1.5rem; border-radius: 20px; text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        .stat-number { font-size: 1.8rem; font-weight: 800; color: #667eea; }
+
+        .image-preview-container { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+        .image-preview { width: 60px; height: 60px; border-radius: 8px; position: relative; }
+        .image-preview img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+        .remove-image { position: absolute; top: -5px; right: -5px; background: red; color: white; border-radius: 50%; width: 20px; height: 20px; border: none; cursor: pointer; font-size: 12px; }
+
+        @media (max-width: 768px) { .admin-container { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <div class="password-modal" id="passwordModal">
+        <div class="password-container">
+            <div class="password-title"><i class="fas fa-lock"></i> Admin Login</div>
+            <input type="password" class="password-input" id="adminPassword" placeholder="Enter Password">
+            <div class="password-buttons">
+                <button class="password-btn primary" onclick="checkPassword()">Enter</button>
+                <button class="password-btn secondary" onclick="closeModal()">Back</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <nav class="navbar">
+            <a href="#" class="logo">Kartiki Resin Arts</a>
+            <br>
+            <a href="index.html" class="home-link"><i class="fas fa-home"></i> View Website</a>
+        </nav>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalCategories">0</div>
+                <div>Categories</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalProducts">0</div>
+                <div>Products</div>
+            </div>
+        </div>
+
+        <div class="admin-container">
+            <div class="admin-card">
+                <h2 class="card-title"><i class="fas fa-tags"></i> Categories</h2>
+                <div class="form-group">
+                    <input type="text" id="newCategory" placeholder="Add new category...">
+                </div>
+                <button class="btn btn-success" onclick="addCategory()"><i class="fas fa-plus"></i> Add</button>
+                <div class="list-container" id="categoriesList"></div>
+            </div>
+
+            <div class="admin-card">
+                <h2 class="card-title"><i class="fas fa-box"></i> Products</h2>
+                <div id="editingIndicator" style="display:none; color: orange; font-weight: bold; margin-bottom: 10px;">Editing Mode ON</div>
+                <div class="form-group">
+                    <input type="text" id="productName" placeholder="Product Name *">
+                </div>
+                <div class="form-group">
+                    <input type="number" id="productPrice" placeholder="Price (₹) *">
+                </div>
+                <div class="form-group">
+                    <select id="productCategory">
+                        <option value="">Select Category</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <textarea id="productDesc" placeholder="Description"></textarea>
+                </div>
+                <div class="form-group">
+                    (Max. 5 Images)
+                    <input type="file" id="imageInput" multiple accept="image/*" style="margin-bottom: 10px;">
+                    <div class="image-preview-container" id="imagePreviewContainer"></div>
+                </div>
+                
+                <button class="btn" id="addProductBtn" onclick="addProduct()">Add Product</button>
+                <button class="btn" id="updateProductBtn" onclick="updateProduct()" style="display:none; background: orange;">Update Product</button>
+                
+                <div class="list-container" id="productsList"></div>
+            </div>
+        </div>
+    </div>
+
+<script>
+const ADMIN_PASSWORD = "kartiki123";
+const PRODUCTS_KEY = "kartiki_products";
+const CATEGORIES_KEY = "kartiki_categories";
+
+let products = [];
+let categories = [];
+let currentImages = [];
+let editingProductId = null;
+
+// AUTH
+function checkPassword() {
+    if (document.getElementById("adminPassword").value === ADMIN_PASSWORD) {
+        document.getElementById("passwordModal").classList.add("hidden");
+        document.getElementById("mainContent").classList.add("show");
+        initAdmin();
+    } else { 
+        alert("⚠️ चुकीचा पासवर्ड! Password: kartiki123"); 
+    }
+}
+
+function closeModal() { window.location.href = "index.html"; }
+
+// LOCALSTORAGE ONLY - 100% WORKING
+function initAdmin() {
+    products = JSON.parse(localStorage.getItem(PRODUCTS_KEY)) || [];
+    categories = JSON.parse(localStorage.getItem(CATEGORIES_KEY)) || [];
+    renderCategories();
+    renderProducts();
+    updateStats();
+    
+    // Image Upload Handling
+    document.getElementById('imageInput').addEventListener('change', function(e) {
+        const files = Array.from(e.target.files);
+        currentImages = []; // Clear previous
+        files.forEach(file => {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                currentImages.push(event.target.result);
+                renderImagePreviews();
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+}
+
+function saveData() {
+    localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products));
+    localStorage.setItem(CATEGORIES_KEY, JSON.stringify(categories));
+    updateStats();
+}
+
+// CATEGORY FUNCTIONS
+function addCategory() {
+    const name = document.getElementById("newCategory").value.trim();
+    if (name && !categories.includes(name)) {
+        categories.push(name);
+        saveData();
+        renderCategories();
+        document.getElementById("newCategory").value = "";
+        alert("✅ Category added: " + name);
+    } else if (categories.includes(name)) {
+        alert("⚠️ Category already exists!");
+    }
+}
+
+function deleteCategory(cat) {
+    if (confirm(`Delete category "${cat}"?\n\nसर्व ${cat} चे products delete होतील.`)) {
+        categories = categories.filter(c => c !== cat);
+        products = products.filter(p => p.category !== cat);
+        saveData();
+        renderCategories();
+        renderProducts();
+        alert("🗑️ Category & products deleted!");
+    }
+}
+
+function renderCategories() {
+    const list = document.getElementById("categoriesList");
+    const select = document.getElementById("productCategory");
+    
+    list.innerHTML = categories.map(c => `
+        <div class="list-item">
+            <span><i class="fas fa-tag"></i> ${c}</span>
+            <button class="btn btn-danger btn-small" onclick="deleteCategory('${c}')">
+                <i class="fas fa-trash"></i> Delete
+            </button>
+        </div>
+    `).join("");
+
+    select.innerHTML = '<option value="">Select Category</option>' + 
+        categories.map(c => `<option value="${c}">${c}</option>`).join("");
+}
+
+// PRODUCT FUNCTIONS
+function renderImagePreviews() {
+    const container = document.getElementById("imagePreviewContainer");
+    container.innerHTML = currentImages.map((img, i) => `
+        <div class="image-preview">
+            <img src="${img}">
+            <button class="remove-image" onclick="removeImage(${i})">×</button>
+        </div>
+    `).join("");
+}
+
+function removeImage(index) {
+    currentImages.splice(index, 1);
+    renderImagePreviews();
+}
+
+function addProduct() {
+    const name = document.getElementById("productName").value.trim();
+    const price = document.getElementById("productPrice").value;
+    const cat = document.getElementById("productCategory").value;
+    
+    if (!name || !price || !cat) {
+        alert("❌ Product Name, Price & Category mandatory आहेत!");
+        return;
+    }
+
+    products.push({
+        id: Date.now(),
+        name, 
+        price: parseFloat(price),
+        category: cat,
+        description: document.getElementById("productDesc").value,
+        images: [...currentImages]
+    });
+
+    saveData();
+    renderProducts();
+    resetForm();
+    alert("✅ Product added successfully!");
+}
+
+function renderProducts() {
+    document.getElementById("productsList").innerHTML = products.map(p => `
+        <div class="list-item">
+            <div>
+                <b>${p.name}</b> 
+                <br> 
+                <small><i class="fas fa-rupee-sign"></i> ${p.price} | ${p.category}</small>
+            </div>
+            <div>
+                <button class="btn btn-small" onclick="editProduct(${p.id})" style="background: #17a2b8;">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+                <button class="btn btn-danger btn-small" onclick="deleteProduct(${p.id})">
+                    <i class="fas fa-trash"></i> Del
+                </button>
+            </div>
+        </div>
+    `).join("");
+}
+
+function deleteProduct(id) {
+    if (confirm("Delete this product?")) {
+        products = products.filter(p => p.id !== id);
+        saveData();
+        renderProducts();
+        alert("🗑️ Product deleted!");
+    }
+}
+
+function editProduct(id) {
+    const p = products.find(x => x.id === id);
+    if (!p) return;
+    
+    editingProductId = id;
+    document.getElementById("productName").value = p.name;
+    document.getElementById("productPrice").value = p.price;
+    document.getElementById("productCategory").value = p.category;
+    document.getElementById("productDesc").value = p.description || "";
+    currentImages = [...p.images];
+    renderImagePreviews();
+    
+    document.getElementById("addProductBtn").style.display = "none";
+    document.getElementById("updateProductBtn").style.display = "block";
+    document.getElementById("editingIndicator").style.display = "block";
+}
+
+function updateProduct() {
+    const index = products.findIndex(p => p.id === editingProductId);
+    if (index === -1) return;
+    
+    products[index] = {
+        ...products[index],
+        name: document.getElementById("productName").value,
+        price: parseFloat(document.getElementById("productPrice").value),
+        category: document.getElementById("productCategory").value,
+        description: document.getElementById("productDesc").value,
+        images: [...currentImages]
+    };
+    
+    saveData();
+    renderProducts();
+    resetForm();
+    alert("✅ Product updated successfully!");
+}
+
+function resetForm() {
+    editingProductId = null;
+    document.getElementById("productName").value = "";
+    document.getElementById("productPrice").value = "";
+    document.getElementById("productDesc").value = "";
+    document.getElementById("productCategory").value = "";
+    currentImages = [];
+    renderImagePreviews();
+    document.getElementById("addProductBtn").style.display = "block";
+    document.getElementById("updateProductBtn").style.display = "none";
+    document.getElementById("editingIndicator").style.display = "none";
+}
+
+function updateStats() {
+    document.getElementById("totalCategories").textContent = categories.length;
+    document.getElementById("totalProducts").textContent = products.length;
+}
+</script>
+
+</body>
+</html>

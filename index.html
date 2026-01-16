@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kartiki Resin Arts | Handcrafted Resin Products</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{overflow-x:hidden}
+body{
+  font-family:system-ui,-apple-system,sans-serif;
+  background:linear-gradient(135deg,#f5f7fa,#c3cfe2);
+  color:#333;
+}
+img{max-width:100%;display:block}
+
+.sidebar{
+  position:fixed;
+  left:-250px;
+  top:0;
+  width:250px;
+  height:100%;
+  background:#b02e72;
+  color:#fff;
+  padding:2rem 1rem;
+  box-shadow:2px 0 12px rgba(0,0,0,.2);
+  transition:.3s;
+  z-index:1500;
+}
+.sidebar h2{
+  margin-bottom:2rem;
+  text-align:center
+}
+.sidebar ul{
+  list-style:none
+}
+.sidebar ul li{
+  margin:1rem 0
+}
+.sidebar ul li a{
+  color:#fff;
+  text-decoration:none;
+  font-weight:600;
+  display:block;
+  padding:.5rem 0;
+  transition:.2s;
+}
+.close-sidebar{
+  position:absolute;
+  top:10px;
+  right:10px;
+  font-size:24px;
+  border:none;
+  background:none;
+  color:#fff;
+  cursor:pointer;
+}
+.top-header{
+  position:sticky;
+  top:0;
+  z-index:100;
+  background:#fff;
+  box-shadow:0 4px 18px rgba(0,0,0,.08);
+}
+.top-header-inner{
+  max-width:1200px;
+  margin:auto;
+  padding:1rem;
+  display:flex;
+  align-items:center;
+  gap:1rem;
+}
+.brand-logo{
+  width:50px;
+  height:50px;
+  border-radius:50%;
+  background:#b02e72;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:800;
+}
+.sidebar-toggle{
+  background:#b02e72;
+  color:#fff;
+  border:none;
+  padding:.5rem .8rem;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:20px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.admin-btn{
+  margin-left:auto;
+  padding:.5rem 1.2rem;
+  border-radius:20px;
+  border:2px solid #f2c9e3;
+  background:#fff0fb;
+  color:#b02e72;
+  cursor:pointer;
+  font-weight:700;
+}
+.search-row{
+  padding:1rem;
+  display:flex;
+  flex-direction:column;
+  gap:.8rem;
+}
+.search-box{
+  display:flex;
+  border:2px solid #e7c7df;
+  border-radius:30px;
+  overflow:hidden
+}
+.search-box input{
+  flex:1;
+  border:none;
+  padding:.7rem;
+  outline:none;
+}
+.search-box button{
+  border:none;
+  background:#b02e72;
+  color:#fff;
+  padding:.7rem 1.2rem;
+}
+.filter-social-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+}
+.filter-social-row select{
+  padding:.45rem .8rem;
+  border-radius:20px;
+}
+.social-icons{
+  display:flex;
+  gap:.6rem;
+}
+.social-icons img{
+  width:34px;
+  height:34px;
+  cursor:pointer;
+  transition:.25s;
+}
+.products-section{
+  max-width:1200px;
+  margin:2rem auto;
+  padding:0 1rem;
+}
+.section-title{
+  text-align:center;
+  font-size:2rem;
+  margin-bottom:2rem;
+}
+.products-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:2.5rem;
+}
+@media(min-width:900px){
+  .products-grid{grid-template-columns:repeat(4,1fr)}
+}
+.product-card{
+  background:#fff;
+  border-radius:18px;
+  overflow:hidden;
+  box-shadow:0 8px 25px rgba(0,0,0,.15);
+  cursor:pointer;
+  transition:.3s;
+}
+.product-image{
+  width:100%;
+  aspect-ratio:1/1;
+  object-fit:contain;
+  background:#f8f9fa;
+}
+.product-info{
+  padding:1rem;
+}
+.product-category{
+  font-size:.75rem;
+  color:#667eea;
+}
+.product-name{font-weight:700;
+  margin:.3rem 0;
+}
+.product-price{color:#e74c3c;
+  font-weight:800;
+}
+.view-details-btn{width:100%;
+  margin-top:.6rem;
+  padding:.6rem;
+  background:#28a745;
+  color:#fff;
+  border:none;
+  border-radius:12px;
+}
+.modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.7);
+  z-index:1000;
+}
+.modal-content{
+  background:#fff;
+  max-width:600px;
+  margin:5vh auto;
+  border-radius:20px;
+  max-height:90vh;
+  overflow:auto;
+  position:relative;
+}
+.close-modal{
+  position:absolute;
+  right:15px;
+  top:10px;
+  font-size:28px;
+  border:none;
+  background:none;
+}
+.modal-header{
+  text-align:center;
+  padding:1.5rem;
+  border-bottom:1px solid #eee;
+}
+.modal-body{
+  padding:1.5rem;
+}
+.detail-row{
+  background:#f8f9fa;
+  padding:.8rem;
+  border-radius:10px;
+  margin-bottom:.7rem;
+}
+.modal-images{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:.6rem;
+  margin:1rem 0;
+}
+.modal-image{
+  height:130px;
+  object-fit:cover;
+  border-radius:10px;
+  cursor:pointer;
+}
+.whatsapp-order-btn{
+  width:100%;
+  background:#25D366;
+  color:#fff;
+  border:none;
+  padding:1rem;
+  border-radius:12px;
+  font-size:1rem;
+}
+.fullscreen{
+  position:fixed;
+  inset:0;
+  background:#000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:2000;
+}
+.fullscreen img{
+  max-width:95%;
+  max-height:95%;
+  }
+</style>
+</head>
+<body>
+
+<div id="sidebar" class="sidebar">
+  <button class="close-sidebar" onclick="toggleSidebar()">×</button>
+  <h2>Kartiki Resin Arts</h2>
+  <ul>
+    <li><a href="#">Home</a></li>
+    <li><a href="#">Products</a></li>
+    <li><a href="#">About Us</a></li>
+    <li><a href="#">Contact</a></li>
+  </ul>
+</div>
+
+<header class="top-header">
+  <div class="top-header-inner">
+    <button class="sidebar-toggle" onclick="toggleSidebar()">
+      <i class="fa fa-bars"></i>
+    </button>
+    <div class="brand-logo">K</div>
+    <strong>Kartiki Resin Arts</strong>
+    <button class="admin-btn" onclick="openAdmin()">Admin</button>
+  </div>
+
+  <div class="search-row">
+    <div class="search-box">
+      <input id="searchInput" placeholder="Search products...">
+      <button onclick="applyFilters()">Search</button>
+    </div>
+
+    <div class="filter-social-row">
+      <select id="categorySelect" onchange="applyFilters()">
+        <option value="all">All Categories</option>
+      </select>
+
+      <div class="social-icons">
+        <img src="https://cdn-icons-png.flaticon.com/128/3955/3955024.png" onclick="openSocial('instagram')" alt="Instagram">
+        <img src="https://cdn-icons-png.flaticon.com/128/5968/5968764.png" onclick="openSocial('facebook')" alt="Facebook">
+        <img src="https://cdn-icons-png.flaticon.com/128/3670/3670147.png" onclick="openSocial('youtube')" alt="YouTube">
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="products-section">
+  <h2 class="section-title">Our Resin Collection</h2>
+  <div id="productsGrid" class="products-grid"></div>
+</section>
+
+<div id="productModal" class="modal">
+  <div class="modal-content">
+    <button class="close-modal" onclick="closeModal()">×</button>
+    <div class="modal-header">
+      <div id="modalCategory"></div>
+      <h2 id="modalProductName"></h2>
+    </div>
+    <div id="modalBody" class="modal-body"></div>
+  </div>
+</div>
+
+<script>
+  async function loadProducts() {
+    const res = await fetch('api/products.php');
+    window.products = await res.json();
+    renderHomeProducts(); // तुमचा existing function
+}
+loadProducts(); // Page load वर call
+
+const WHATSAPP="919579590991";
+const PRODUCTS_KEY="kartiki_products";
+const CATEGORIES_KEY="kartiki_categories";
+
+let products=[], current=[];
+
+function loadProducts(){
+    products = JSON.parse(localStorage.getItem(PRODUCTS_KEY)) || [];
+}
+
+function loadCategories(){
+    const categorySelect = document.getElementById("categorySelect");
+    const savedCategories = JSON.parse(localStorage.getItem(CATEGORIES_KEY)) || [];
+    
+    categorySelect.innerHTML = '<option value="all">All Categories</option>';
+    
+    savedCategories.forEach(c => {
+        const option = document.createElement("option");
+        option.value = c;
+        option.textContent = c;
+        categorySelect.appendChild(option);
+    });
+}
+
+function displayProducts(list){
+    const productsGrid = document.getElementById("productsGrid");
+    productsGrid.innerHTML="";
+    current=list;
+
+    if(!list.length){
+        productsGrid.innerHTML="<p style='text-align:center; width:100%; grid-column: 1 / -1;'>No products found</p>";
+        return;
+    }
+
+    list.forEach((p,i)=>{
+        productsGrid.innerHTML+=`
+            <div class="product-card" onclick="openModal(${i})">
+                <img src="${p.images[0] || 'https://via.placeholder.com/150'}" class="product-image">
+                <div class="product-info">
+                    <div class="product-category">${p.category}</div>
+                    <div class="product-name">${p.name}</div>
+                    <div class="product-price">₹${p.price}</div>
+                    <button class="view-details-btn">View Details</button>
+                </div>
+            </div>`;
+    });
+}
+
+function applyFilters(){
+    const q=document.getElementById("searchInput").value.toLowerCase();
+    const c=document.getElementById("categorySelect").value;
+    displayProducts(products.filter(p=>
+        (c==="all"||p.category===c)&&
+        (p.name.toLowerCase().includes(q)||(p.description||"").toLowerCase().includes(q))
+    ));
+}
+
+function openModal(i){
+    const p=current[i];
+    document.getElementById("modalProductName").textContent=p.name;
+    document.getElementById("modalCategory").textContent=p.category;
+    document.getElementById("modalBody").innerHTML=`
+        <div class="detail-row">Price: ₹${p.price}</div>
+        <div class="detail-row">${p.description||"No description available"}</div>
+        <div class="modal-images">
+            ${p.images.map(img=>`<img src="${img}" class="modal-image" onclick="openFull('${img}')">`).join("")}
+        </div>
+        <button class="whatsapp-order-btn" onclick="order('${p.name}',${p.price})">
+            <i class="fab fa-whatsapp"></i> Order on WhatsApp
+        </button>`;
+    document.getElementById("productModal").style.display="block";
+}
+
+function closeModal(){document.getElementById("productModal").style.display="none"}
+
+function openFull(src){
+    const d=document.createElement("div");
+    d.className="fullscreen";
+    d.innerHTML=`<img src="${src}" onclick="this.parentElement.remove()">`;
+    document.body.appendChild(d);
+}
+
+function order(n,p){
+    window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent("I am interested in:\nProduct: "+n+"\nPrice: ₹"+p)}`);
+}
+
+function openAdmin(){window.location.href="admin.html"}
+
+function openSocial(type){
+    const links={
+        instagram:"https://www.instagram.com/kartiki_art_studio",
+        facebook:"https://www.facebook.com/kartiki_art_studio",
+        youtube:"https://www.youtube.com/@kartikiswami"
+    };
+    window.open(links[type],"_blank");
+}
+
+function toggleSidebar(){
+    const sb=document.getElementById("sidebar");
+    sb.style.left = (sb.style.left==="0px") ? "-250px" : "0px";
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+    loadProducts();
+    loadCategories();
+    displayProducts(products);
+});
+</script>
+
+</body>
+</html>
