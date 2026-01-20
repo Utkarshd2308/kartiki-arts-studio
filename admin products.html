@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Products - Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f5f7fa; padding: 20px; }
+        
+        #passwordOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex; justify-content: center; align-items: center; z-index: 10000;
+        }
+        .password-box {
+            background: white; padding: 2.5rem; border-radius: 25px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2); text-align: center; width: 90%; max-width: 400px;
+        }
+        .password-box input {
+            width: 100%; padding: 12px; margin: 15px 0; border: 2px solid #e9ecef; border-radius: 12px; text-align: center; font-size: 18px; outline: none;
+        }
+
+        .navbar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 1rem; border-radius: 20px; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; color: white;}
+        .nav-links a { color: white; text-decoration: none; margin-left: 15px; font-weight: 600; }
+        .admin-card { background: white; border-radius: 25px; padding: 2rem; max-width: 800px; margin: 0 auto; box-shadow: 0 15px 40px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 1rem; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.8rem; border: 2px solid #e9ecef; border-radius: 12px; }
+        
+        /* Updated Image Preview Styles */
+        .image-preview-container { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+        .image-preview { 
+            width: 80px; height: 80px; position: relative; 
+            border: 2px solid #ddd; border-radius: 12px; overflow: visible; 
+        }
+        .image-preview img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
+        
+        /* The Cross Button */
+        .remove-img-btn {
+            position: absolute; top: -8px; right: -8px;
+            background: #ff4d4d; color: white; border: none;
+            width: 22px; height: 22px; border-radius: 50%;
+            cursor: pointer; font-size: 12px; font-weight: bold;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 10;
+        }
+
+        .btn { background: #667eea; color: white; border: none; padding: 12px; border-radius: 12px; cursor: pointer; width: 100%; font-weight: bold; transition: 0.3s; }
+        .list-container { margin-top: 20px; background: #f8f9fa; padding: 10px; border-radius: 15px; }
+        .list-item { background: white; padding: 10px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;}
+        .btn-small { width: auto; font-size: 12px; padding: 5px 10px; margin-left: 5px; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div id="passwordOverlay">
+        <div class="password-box">
+            <i class="fas fa-user-shield" style="font-size: 3rem; color: #667eea;"></i>
+            <h2 style="margin-top: 10px;">Admin Access</h2>
+            <input type="password" id="adminPass" placeholder="Enter Password">
+            <button class="btn" onclick="checkPassword()">Verify & Enter</button>
+            <p id="passError" style="color: red; margin-top: 10px; display: none;">चुकीचा पासवर्ड!</p>
+        </div>
+    </div>
+
+    <nav class="navbar">
+        <div style="font-weight: 800;">Kartiki Admin</div>
+        <div class="nav-links">
+            <a href="admin categories.html"><i class="fas fa-tags"></i> Categories</a>
+            <a href="index.html"><i class="fas fa-home"></i> View Site</a>
+        </div>
+    </nav>
+ <a href="admin orders.html"><i class="fas fa-list"> Received Orders</i></a>
+ <br>
+ <br>
+    <div class="admin-card">
+        <h2 style="margin-bottom: 15px;"><i class="fas fa-box"></i> Manage Products</h2>
+        <div id="editingIndicator" style="display:none; color: orange; font-weight: bold; margin-bottom: 10px;">Editing Mode ON</div>
+        
+        <div class="form-group"><input type="text" id="productName" placeholder="Product Name *"></div>
+        <div class="form-group"><input type="number" id="productPrice" placeholder="Price (₹) *"></div>
+        <div class="form-group"><select id="productCategory"><option value="">Select Category</option></select></div>
+        <div class="form-group"><textarea id="productDesc" placeholder="Description"></textarea></div>
+        <div class="form-group">
+            <label style="font-size: 0.85rem; color: #666;">Upload Photos (Max 5):</label>
+            <input type="file" id="imageInput" multiple accept="image/*" onchange="handleImageUpload(this)" style="margin-top:5px;">
+            <div class="image-preview-container" id="imagePreviewContainer"></div>
+        </div>
+        
+        <button class="btn" id="addProductBtn" onclick="addProduct()">Add Product</button>
+        <button class="btn" id="updateProductBtn" onclick="updateProduct()" style="display:none; background: orange;">Update Product</button>
+
+        <div class="list-container" id="productsList"></div>
+    </div>
+    <br>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBHDap_BTykTSNcH0l1m1VdLB_MK6LgZCo",
+            authDomain: "artikiart.firebaseapp.com",
+            projectId: "artikiart",
+            storageBucket: "artikiart.firebasestorage.app",
+            messagingSenderId: "191730558371",
+            appId: "1:191730558371:web:f3a64f2a04a78fa5a0a616",
+            measurementId: "G-3L47DKFDSQ"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let currentImages = [];
+        let editingProductId = null;
+
+        function checkPassword() {
+            const pass = document.getElementById("adminPass").value;
+            if (pass === "kartiki123") {
+                document.getElementById("passwordOverlay").style.display = "none";
+                listenToData();
+            } else {
+                document.getElementById("passError").style.display = "block";
+            }
+        }
+
+        function listenToData() {
+            db.ref('categories').on('value', (snap) => {
+                const select = document.getElementById("productCategory");
+                select.innerHTML = '<option value="">Select Category</option>';
+                const data = snap.val();
+                if(data) Object.values(data).forEach(cat => select.innerHTML += `<option value="${cat}">${cat}</option>`);
+            });
+
+            db.ref('products').on('value', (snap) => {
+                const data = snap.val();
+                const list = document.getElementById("productsList");
+                list.innerHTML = "";
+                if(data) Object.keys(data).forEach(key => {
+                    const p = data[key];
+                    list.innerHTML += `
+                        <div class="list-item">
+                            <div><b>${p.name}</b><br><small>₹${p.price}</small></div>
+                            <div>
+                                <button class="btn-small" style="background:#17a2b8" onclick="editProduct('${key}')">Edit</button>
+                                <button class="btn-small" style="background:red" onclick="deleteProduct('${key}')">Delete</button>
+                            </div>
+                        </div>`;
+                });
+            });
+        }
+
+        // Updated handleImageUpload with 5 image limit
+        function handleImageUpload(input) {
+            const files = Array.from(input.files);
+            
+            if (currentImages.length + files.length > 5) {
+                alert("तुम्ही जास्तीत जास्त ५ इमेजेस अपलोड करू शकता!");
+                input.value = ""; 
+                return;
+            }
+
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => { 
+                    currentImages.push(e.target.result); 
+                    renderPreviews(); 
+                };
+                reader.readAsDataURL(file);
+            });
+            input.value = ""; 
+        }
+
+        function renderPreviews() {
+            const container = document.getElementById("imagePreviewContainer");
+            container.innerHTML = "";
+            currentImages.forEach((img, index) => {
+                const div = document.createElement("div");
+                div.className = "image-preview";
+                div.innerHTML = `
+                    <img src="${img}">
+                    <button class="remove-img-btn" onclick="removeSelectedImage(${index})">×</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function removeSelectedImage(index) {
+            currentImages.splice(index, 1);
+            renderPreviews();
+        }
+
+        function addProduct() {
+            const name = document.getElementById("productName").value;
+            const price = document.getElementById("productPrice").value;
+            const cat = document.getElementById("productCategory").value;
+            if(!name || !price || !cat) return alert("Fill all fields!");
+            db.ref('products').push({ 
+                name, 
+                price: parseFloat(price), 
+                category: cat, 
+                description: document.getElementById("productDesc").value, 
+                images: currentImages 
+            }).then(() => { resetForm(); alert("Product Added!"); });
+        }
+
+        function deleteProduct(id) { if(confirm("Delete?")) db.ref('products/' + id).remove(); }
+
+        function editProduct(id) {
+            editingProductId = id;
+            db.ref('products/' + id).once('value', (snap) => {
+                const p = snap.val();
+                document.getElementById("productName").value = p.name;
+                document.getElementById("productPrice").value = p.price;
+                document.getElementById("productCategory").value = p.category;
+                document.getElementById("productDesc").value = p.description;
+                currentImages = p.images || [];
+                renderPreviews();
+                document.getElementById("addProductBtn").style.display = "none";
+                document.getElementById("updateProductBtn").style.display = "block";
+                document.getElementById("editingIndicator").style.display = "block";
+                window.scrollTo(0,0);
+            });
+        }
+
+        function updateProduct() {
+            if(!editingProductId) return;
+            db.ref('products/' + editingProductId).update({
+                name: document.getElementById("productName").value,
+                price: parseFloat(document.getElementById("productPrice").value),
+                category: document.getElementById("productCategory").value,
+                description: document.getElementById("productDesc").value,
+                images: currentImages
+            }).then(() => { resetForm(); alert("Updated!"); });
+        }
+
+        function resetForm() {
+            editingProductId = null;
+            document.querySelectorAll('input:not([type=password]), textarea, select').forEach(i => i.value = "");
+            currentImages = [];
+            renderPreviews();
+            document.getElementById("addProductBtn").style.display = "block";
+            document.getElementById("updateProductBtn").style.display = "none";
+            document.getElementById("editingIndicator").style.display = "none";
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Form | Kartiki Resin Arts</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { font-family: system-ui, sans-serif; background: #f5f7fa; padding: 20px; color: #333; }
+        .form-container { max-width: 500px; margin: auto; background: #fff; padding: 25px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        h2 { color: #b02e72; text-align: center; margin-bottom: 20px; }
+        .product-summary { background: #fff0fb; padding: 15px; border-radius: 12px; margin-bottom: 20px; border-left: 5px solid #b02e72; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.9rem; }
+        input, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; outline: none; }
+        input:focus { border-color: #b02e72; }
+        .submit-btn { width: 100%; background: #25D366; color: white; border: none; padding: 15px; border-radius: 12px; font-size: 1.1rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; }
+        
+        .print-btn { width: 100%; background: #3498db; color: white; border: none; padding: 12px; border-radius: 12px; font-size: 1rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; transition: 0.3s; }
+        .print-btn:hover { background: #2980b9; }
+
+        .back-link { display: block; text-align: center; margin-top: 15px; color: #666; text-decoration: none; font-size: 0.9rem; }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .submit-btn, .print-btn, .back-link, label, input, textarea, h2, .product-summary { display: none; }
+            .form-container { box-shadow: none; border: none; width: 100%; }
+            .print-receipt-only { display: block !important; }
+        }
+        .print-receipt-only { display: none; border: 2px solid #333; padding: 20px; border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>Complete Your Order</h2>
+    
+    <div class="product-summary">
+        <div id="summaryName" style="font-weight: bold;">Product: </div>
+        <div id="summaryPrice">Price: </div>
+    </div>
+
+    <form id="orderForm">
+        <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="custName" placeholder="Enter your name" required>
+        </div>
+        <div class="form-group">
+            <label>Contact Number</label>
+            <input type="tel" id="custPhone" placeholder="Enter mobile number" required>
+        </div>
+        <div class="form-group">
+            <label>Delivery Address</label>
+            <textarea id="custAddress" rows="4" placeholder="House No, Street, City, Pincode" required></textarea>
+        </div>
+        <div class="form-group">
+            <label>Note (Optional)</label>
+            <input type="text" id="custNote" placeholder="Any special request?">
+        </div>
+        
+        <button type="submit" id="submitBtn" class="submit-btn">
+            <i class="fab fa-whatsapp"></i> Send Order via WhatsApp
+        </button>
+
+        <button type="button" onclick="printReceipt()" class="print-btn">
+            <i class="fas fa-print"></i> Print Receipt
+        </button>
+    </form>
+    
+    <a href="javascript:history.back()" class="back-link">Go Back</a>
+
+    <div id="printableReceipt" class="print-receipt-only">
+        <center>
+            <h1 style="color: #b02e72;">Kartiki Resin Arts</h1>
+            <p>Order Confirmation Receipt</p>
+        </center>
+        <hr>
+        <p><strong>Order ID:</strong> <span id="rOrderId">---</span></p>
+        <p><strong>Date:</strong> <span id="rDate">---</span></p>
+        <hr>
+        <p><strong>Product:</strong> <span id="rPName">---</span></p>
+        <p><strong>Price:</strong> ₹<span id="rPrice">---</span></p>
+        <hr>
+        <p><strong>Customer:</strong> <span id="rCName">---</span></p>
+        <p><strong>Mobile:</strong> <span id="rCPhone">---</span></p>
+        <p><strong>Address:</strong> <span id="rAddress">---</span></p>
+        <br>
+        <center><p>Thank you for shopping with us!</p></center>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyBHDap_BTykTSNcH0l1m1VdLB_MK6LgZCo",
+        authDomain: "artikiart.firebaseapp.com",
+        projectId: "artikiart",
+        storageBucket: "artikiart.firebasestorage.app",
+        messagingSenderId: "191730558371",
+        appId: "1:191730558371:web:f3a64f2a04a78fa5a0a616"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const pId = urlParams.get('id');
+    const pName = urlParams.get('name');
+    const pPrice = urlParams.get('price');
+
+    document.getElementById('summaryName').innerText += " " + pName;
+    document.getElementById('summaryPrice').innerText += " ₹" + pPrice;
+
+    let lastOrderId = "Not Generated Yet";
+
+    document.getElementById('orderForm').onsubmit = function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.innerText = "Saving Order...";
+
+        const custName = document.getElementById('custName').value;
+        const custPhone = document.getElementById('custPhone').value;
+        const custAddress = document.getElementById('custAddress').value;
+        const custNote = document.getElementById('custNote').value;
+        const orderTimestamp = new Date().toLocaleString();
+
+        const newOrderRef = database.ref('orders').push();
+        lastOrderId = newOrderRef.key;
+
+        const orderData = {
+            productId: pId || "N/A",
+            productName: pName,
+            price: pPrice,
+            customerName: custName,
+            customerPhone: custPhone,
+            address: custAddress,
+            note: custNote || "None",
+            timestamp: orderTimestamp,
+            status: "Pending"
+        };
+
+        newOrderRef.set(orderData)
+        .then(() => {
+            // Receipt मध्ये Order ID लगेच अपडेट करणे
+            document.getElementById('rOrderId').innerText = lastOrderId;
+            
+            const message = `*NEW ORDER DETAILS* 🛍️\n\n*Order ID:* ${lastOrderId}\n*Product:* ${pName}\n*Price:* ₹${pPrice}\n--------------------------\n*Customer:* ${custName}\n*Mobile:* ${custPhone}\n*Address:* ${custAddress}\n*Time:* ${orderTimestamp}\n\nPlease confirm my order.`;
+            const whatsappNumber = "919579590991";
+            window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
+            
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fab fa-whatsapp"></i> Send Order via WhatsApp`;
+            alert("Order Saved Successfully! You can now print the receipt.");
+        });
+    };
+
+    function printReceipt() {
+        const name = document.getElementById('custName').value;
+        if(!name) { 
+            alert("Please fill details and click 'Send Order' first to generate Order ID!"); 
+            return; 
+        }
+
+        // पावतीमध्ये माहिती भरणे
+        document.getElementById('rOrderId').innerText = lastOrderId;
+        document.getElementById('rDate').innerText = new Date().toLocaleString();
+        document.getElementById('rPName').innerText = pName;
+        document.getElementById('rPrice').innerText = pPrice;
+        document.getElementById('rCName').innerText = name;
+        document.getElementById('rCPhone').innerText = document.getElementById('custPhone').value;
+        document.getElementById('rAddress').innerText = document.getElementById('custAddress').value;
+
+        window.print();
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Categories - Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* मूळ CSS मधील महत्त्वाचे भाग */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; padding: 20px; }
+        .navbar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 1rem; border-radius: 20px; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .nav-links a { color: white; text-decoration: none; margin-left: 15px; font-weight: 600; opacity: 0.9; }
+        .nav-links a:hover { opacity: 1; text-decoration: underline; }
+        .admin-card { background: white; border-radius: 25px; padding: 2rem; max-width: 600px; margin: 0 auto; box-shadow: 0 15px 40px rgba(0,0,0,0.1); }
+        .card-title { font-size: 1.6rem; margin-bottom: 1.5rem; font-weight: 800; color: #444; }
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group input { width: 100%; padding: 0.8rem; border: 2px solid #e9ecef; border-radius: 12px; outline: none; }
+        .btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 0.8rem; border-radius: 12px; font-weight: 600; cursor: pointer; width: 100%; }
+        .btn-danger { background: #ff4757; width: auto; padding: 0.4rem 0.8rem; font-size: 12px; }
+        .list-container { max-height: 400px; overflow-y: auto; background: #f8f9fa; border-radius: 15px; padding: 10px; margin-top: 15px; }
+        .list-item { background: white; padding: 12px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div style="color: white; font-weight: 800; font-size: 1.2rem;">Kartiki Admin</div>
+        <div class="nav-links">
+            <a href="admin products.html"><i class="fas fa-box"></i> Products</a>
+            <a href="index.html"><i class="fas fa-home"></i> View Site</a>
+        </div>
+    </nav>
+
+    <div class="admin-card">
+        <h2 class="card-title"><i class="fas fa-tags"></i> Add Category</h2>
+        <div class="form-group">
+            <input type="text" id="newCategory" placeholder="Enter category name...">
+        </div>
+        <button class="btn" id="addCatBtn" onclick="addCategory()">Add Category</button>
+        
+        <div class="list-container" id="categoriesList"></div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBHDap_BTykTSNcH0l1m1VdLB_MK6LgZCo",
+            authDomain: "artikiart.firebaseapp.com",
+            projectId: "artikiart",
+            storageBucket: "artikiart.firebasestorage.app",
+            messagingSenderId: "191730558371",
+            appId: "1:191730558371:web:f3a64f2a04a78fa5a0a616",
+            measurementId: "G-3L47DKFDSQ"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        function listenToData() {
+            db.ref('categories').on('value', (snap) => {
+                const data = snap.val();
+                const list = document.getElementById("categoriesList");
+                list.innerHTML = "";
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        list.innerHTML += `
+                            <div class="list-item">
+                                <span><i class="fas fa-tag"></i> ${data[key]}</span>
+                                <button class="btn btn-danger" onclick="deleteCategory('${key}')">Delete</button>
+                            </div>`;
+                    });
+                }
+            });
+        }
+
+        function addCategory() {
+            const input = document.getElementById("newCategory");
+            const name = input.value.trim();
+            if (!name) return alert("नाव लिहा!");
+            
+            const btn = document.getElementById("addCatBtn");
+            btn.disabled = true; btn.innerText = "Adding...";
+
+            db.ref('categories').push(name).then(() => {
+                input.value = "";
+                btn.disabled = false; btn.innerText = "Add Category";
+            });
+        }
+
+        function deleteCategory(id) {
+            if(confirm("डिलीट करायचे?")) db.ref('categories/' + id).remove();
+        }
+
+        listenToData();
+    </script>
+</body>
+</html>
